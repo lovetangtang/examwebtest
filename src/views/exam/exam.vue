@@ -83,9 +83,37 @@
                                 打招呼的方式一般有（）（）（）（） (20.0分)
                             </p>
                             <Row>
-                                <Col span="11" class="margin-top-20">
+                                <Col span="22" class="margin-top-20">
                                 <Form ref="formInline" :label-width="30">
-                                    <FormItem label="（1）">
+                                    <div class="margin-bottom-10">
+                                        <Input>
+                                        <span slot="prepend">
+                                            <span>&nbsp;1&nbsp;</span>
+                                        </span>
+                                        </Input>
+                                    </div>
+                                    <div class="margin-bottom-10">
+                                        <Input>
+                                        <span slot="prepend">
+                                            <span>&nbsp;2&nbsp;</span>
+                                        </span>
+                                        </Input>
+                                    </div>
+                                    <div class="margin-bottom-10">
+                                        <Input>
+                                        <span slot="prepend">
+                                            <span>&nbsp;3&nbsp;</span>
+                                        </span>
+                                        </Input>
+                                    </div>
+                                    <div class="margin-bottom-10">
+                                        <Input>
+                                        <span slot="prepend">
+                                            <span>&nbsp;4&nbsp;</span>
+                                        </span>
+                                        </Input>
+                                    </div>
+                                    <!-- <FormItem label="（1）">
                                         <Input placeholder=""></Input>
                                     </FormItem>
                                     <FormItem label="（2）">
@@ -96,7 +124,7 @@
                                     </FormItem>
                                     <FormItem label="（4）">
                                         <Input placeholder=""></Input>
-                                    </FormItem>
+                                    </FormItem> -->
                                 </Form>
                                 </Col>
                             </Row>
@@ -171,7 +199,14 @@
                         <p class="emrate-tmv">00:49:51</p>
                     </div>
                     <div class="item-answer">
-                        <p class="emrate-ascard ft-size15"><Icon class="ansico" type="clipboard"></Icon>答题卡</p>
+                        <p @click="ansmodal = true" class="emrate-ascard ft-size15">
+                            <Icon class="ansico" type="clipboard"></Icon>答题卡
+                        </p>
+                        <Modal v-model="ansmodal" title="答题卡">
+                            <p>单选题(1)</p>
+                            <p>The width of the dialog box is responsive, and the width becomes
+                                <code>auto</code> when the screen size is less than 768px.</p>
+                        </Modal>
                     </div>
                 </div>
                 <div class="box-exame pd-top10">
@@ -193,6 +228,7 @@
         name: 'exam',
         data () {
             return {
+                ansmodal: false,
                 formItem: {
                     radio: 'male',
                     checkbox: []
@@ -232,7 +268,8 @@
                                 }
                             });
                             editor.on('keydown', function (e) {
-                                localStorage.editorContent = tinymce.get('tinymceEditer').getContent({'format': 'text'
+                                localStorage.editorContent = tinymce.get('tinymceEditer').getContent({
+                                    'format': 'text'
                                 });
                             });
                         }
