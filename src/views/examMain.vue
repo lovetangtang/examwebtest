@@ -151,13 +151,13 @@
         },
         watch: {
             '$route' (to) {
-                this.$store.commit('setCurrentPageName', to.name);
-                let pathArr = util.setCurrentPath(this, to.name);
-                if (pathArr.length > 2) {
-                    this.$store.commit('addOpenSubmenu', pathArr[1].name);
-                }
-                this.checkTag(to.name);
-                localStorage.currentPageName = to.name;
+                // this.$store.commit('setCurrentPageName', to.name);
+                // let pathArr = util.setCurrentPath(this, to.name);
+                // if (pathArr.length > 2) {
+                //     this.$store.commit('addOpenSubmenu', pathArr[1].name);
+                // }
+                // this.checkTag(to.name);
+                // localStorage.currentPageName = to.name;
             },
             lang () {
                 util.setCurrentPath(this, this.$route.name); // 在切换语言时用于刷新面包屑
@@ -166,7 +166,7 @@
         mounted () {
             this.init();
             this.$nextTick(() => {
-                if (this.$route.query) {
+                if (this.$route.query && this.$route.query.examName) {
                     window.document.title = this.$route.query.examName;
                 };
             });

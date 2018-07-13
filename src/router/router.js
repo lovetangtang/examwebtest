@@ -44,6 +44,7 @@ export const preview = {
     component: () => import('@/views/form/article-publish/preview.vue')
 };
 
+// 答题试卷页面
 export const examstart = {
     path: '/examstart',
     name: 'examstart',
@@ -52,6 +53,27 @@ export const examstart = {
         { path: 'index', name: 'emstindex', component: () => import('@/views/exam/exam.vue') }
     ]
 };
+
+// 答案解析试卷页面
+export const examresolve = {
+    path: '/examresolve',
+    name: 'examresolve',
+    component:examMain,
+    children: [
+        { path: 'index', name: 'examresolveindex', component: () => import('@/views/examresolve/examresolve.vue') }
+    ]
+};
+
+//分数结果页面
+export const examres = {
+    path: '/examres',
+    name: 'examres',
+    component:examMain,
+    children: [
+        { path: 'index', name: 'examresindex', component: () => import('@/views/examres/examres.vue') }
+    ]
+};
+
 
 export const locking = {
     path: '/locking',
@@ -115,7 +137,9 @@ export const appRouter = [
 export const routers = [
     loginRouter,
     otherRouter,
+    examres,
     examstart,
+    examresolve,
     preview,
     locking,
     ...appRouter,
