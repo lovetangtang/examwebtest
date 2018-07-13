@@ -262,7 +262,7 @@
                                 </Col>
                             </Row>
                         </div>
-                           <div class="box-content">
+                        <div class="box-content">
                             <Row>
                                 <Col span="22" class="exam-pdlr25">
                                 <p class="ft-nm">
@@ -298,7 +298,7 @@
                                     请简单说一下你对老唐帅气的理解。 (20.0分)
                                 </p>
                                 <Row class="examline-bottom">
-                                    <Col  span="11" class="margin-top-10">
+                                    <Col span="11" class="margin-top-10">
                                     <textarea class='tinymce-textarea' id="tinymceEditer1"></textarea>
                                     </Col>
                                 </Row>
@@ -308,7 +308,7 @@
                                 </Col>
                             </Row>
                         </div>
-                         <div class="box-content">
+                        <div class="box-content">
                             <Row>
                                 <Col span="22" class="exam-pdlr25">
                                 <p class="ft-nm">
@@ -316,7 +316,7 @@
                                     请简单说一下你对老唐帅气的理解。 (20.0分)
                                 </p>
                                 <Row class="examline-bottom">
-                                    <Col  span="11" class="margin-top-10 ">
+                                    <Col span="11" class="margin-top-10 ">
                                     <textarea class='tinymce-textarea ' id="tinymceEditer2"></textarea>
                                     </Col>
                                 </Row>
@@ -334,7 +334,9 @@
                     <div class="box-exame">
                         <div class="emrate-time">
                             <p class="item-lable"> 剩余时间</p>
-                            <p class="emrate-tmv">00:49:51</p>
+                            <p class="emrate-tmv">
+                                <countdown endTime="1532078700" :callback="callback" endText="已结束"></countdown>
+                            </p>
                         </div>
                         <div class="item-answer">
                             <p @click="ansmodal = true" class="emrate-ascard ft-size15">
@@ -392,6 +394,7 @@
             </Col>
         </Row>
         <template>
+            <Spin size="large" fix v-if="pageSpinShow"></Spin>
             <BackTop :height="100" :bottom="10">
                 <div class="top">返回顶端</div>
             </BackTop>
@@ -400,11 +403,16 @@
 </template>
 <script>
     import tinymce from 'tinymce';
+    import countdown from './countdown.vue';
     export default {
         name: 'exam',
+        components: {
+            countdown
+        },
         data () {
             return {
                 ansmodal: false,
+                pageSpinShow: true,
                 formItem: {
                     radio: 'male',
                     checkbox: []
@@ -413,6 +421,9 @@
         },
         mounted () {
             this.init();
+            setTimeout(() => {
+                this.pageSpinShow = false;
+            }, 2000);
             this.$nextTick(() => {
 
             });
@@ -440,47 +451,68 @@
                             setup: function (editor) {
                                 editor.on('init', function (e) {
                                     vm.spinShow = false;
-                                    if (localStorage.editorContent) {
-                                        tinymce.get('tinymceEditer').setContent(localStorage.editorContent);
-                                    }
+                                    // if (localStorage.editorContent) {
+                                    //     tinymce.get('tinymceEditer').setContent(localStorage.editorContent);
+                                    // }
                                 });
                                 editor.on('keydown', function (e) {
-                                    localStorage.editorContent = tinymce.get('tinymceEditer').getContent({
-                                        'format': 'text'
-                                    });
+                                    // localStorage.editorContent = tinymce.get('tinymceEditer').getContent({
+                                    //     'format': 'text'
+                                    // });
                                 });
                             }
                         });
                     }
                 });
             },
+            fun_submitexam () {
+                this.$Spin.show({
+                    render: (h) => {
+                        return h('div', [
+                            h('Icon', {
+                                'class': 'demo-spin-icon-load',
+                                props: {
+                                    type: 'load-c',
+                                    size: 28
+                                }
+                            }),
+                            h('div', '提交试卷中')
+                        ]);
+                    }
+                });
+                setTimeout(() => {
+                    this.$Spin.hide();
+                    this.$router.push({
+                        name: 'examresindex',
+                        query: []
+                    });
+                }, 3000);
+            },
+            callback (v) {
+                this.$Modal.confirm({
+                    title: '确认交卷',
+                    'mask-closable': 'false',
+                    content: '<p style="font-size:18px">答题时间到，系统将在3秒后自动交卷</p>',
+                    onOk: () => {
+                        this.$Message.info('Clicked ok');
+                    },
+                    onCancel: () => {
+                        this.$Message.info('Clicked cancel');
+                    }
+                });
+                setTimeout(() => {
+                    this.$Modal.remove();
+                    this.fun_submitexam();
+                }, 2000);
+            },
             handlersubmit () {
                 this.$Modal.confirm({
                     title: '确认交卷',
+                    'mask-closable': 'false',
                     content: '<p style="font-size:18px">当前题目还未答完，是否确认交卷</p>',
                     onOk: () => {
                         this.$Message.info('Clicked ok');
-                        this.$Spin.show({
-                            render: (h) => {
-                                return h('div', [
-                                    h('Icon', {
-                                        'class': 'demo-spin-icon-load',
-                                        props: {
-                                            type: 'load-c',
-                                            size: 28
-                                        }
-                                    }),
-                                    h('div', '提交试卷中')
-                                ]);
-                            }
-                        });
-                        setTimeout(() => {
-                            this.$Spin.hide();
-                            this.$router.push({
-                                name: 'examresindex',
-                                query: []
-                            });
-                        }, 13000);
+                        this.fun_submitexam();
                     },
                     onCancel: () => {
                         this.$Message.info('Clicked cancel');
