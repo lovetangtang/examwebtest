@@ -54,6 +54,17 @@ export const examstart = {
     ]
 };
 
+// 逐题答题模式界面
+export const examgraduallyem = {
+    path: '/examstart',
+    name: 'examstart',
+    component:examMain,
+    children: [
+        { path: 'graduallyem', name: 'graduallyem', component: () => import('@/views/exam/graduallyem.vue') }
+    ]
+};
+
+
 // 答案解析试卷页面
 export const examresolve = {
     path: '/examresolve',
@@ -140,6 +151,7 @@ export const routers = [
     examres,
     examstart,
     examresolve,
+    examgraduallyem,
     preview,
     locking,
     ...appRouter,

@@ -9,6 +9,14 @@
             <Row :gutter="50">
                 <Col span="20">
                 <div class="box">
+                    <template v-if="ck in subjectData">
+                        <template v-if="">
+                            
+                        </template>
+
+
+                    </template>
+
                     <!-- 单选题 -->
                     <div class="box-eame-item">
                         <div class="box-head">
@@ -57,6 +65,7 @@
                             </Row>
                         </div>
                     </div>
+
                     <!-- 多选题 -->
                     <div class="box-eame-item">
                         <div class="box-head">
@@ -121,6 +130,7 @@
                             </Row>
                         </div>
                     </div>
+
                     <!-- 填空题 -->
                     <div class="box-eame-item">
                         <div class="box-head">
@@ -235,6 +245,7 @@
                             </Row>
                         </div>
                     </div>
+
                     <!-- 判断题 -->
                     <div class="box-eame-item">
                         <div class="box-head">
@@ -285,6 +296,7 @@
                             </Row>
                         </div>
                     </div>
+
                     <!-- 问答题 -->
                     <div class="box-eame-item">
                         <div class="box-head">
@@ -335,7 +347,7 @@
                         <div class="emrate-time">
                             <p class="item-lable"> 剩余时间</p>
                             <p class="emrate-tmv">
-                                <countdown endTime="1532078700" :callback="callback" endText="已结束"></countdown>
+                                <countdown endTime="1533121920" :callback="callback" endText="已结束"></countdown>
                             </p>
                         </div>
                         <div class="item-answer">
@@ -403,6 +415,9 @@
 </template>
 <script>
     import tinymce from 'tinymce';
+    import {
+        GetAwExamList
+    } from '@/api/awexam';
     import countdown from './countdown.vue';
     export default {
         name: 'exam',
@@ -413,11 +428,19 @@
             return {
                 ansmodal: false,
                 pageSpinShow: true,
+                subjectData: [],
+                listQuery: {
+                    action: 'getawexamlist',
+                    KeyID: 0
+                },
                 formItem: {
                     radio: 'male',
                     checkbox: []
                 }
             };
+        },
+        created () {
+            this.fetchData();
         },
         mounted () {
             this.init();
@@ -464,6 +487,19 @@
                         });
                     }
                 });
+            },
+            // 刷新数据
+            fetchData () {
+                try {
+                    let KeyID = this.$route.query.KeyID;
+                    console.log(this.$route.query.KeyID);
+                    this.listQuery.KeyID = KeyID;
+                    GetAwExamList(this.listQuery).then(response => {
+                        this.subjectData = response.data;
+                    });
+                } catch (error) {
+                    console.log(error);
+                }
             },
             fun_submitexam () {
                 this.$Spin.show({

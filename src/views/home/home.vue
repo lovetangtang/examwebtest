@@ -27,36 +27,71 @@
             <Col :xs="24">
             <Row class-name="home-page-row1" :gutter="10">
                 <template v-for="item in examlist">
-                    <Col :xs="24" :sm="12" :md="8" :style="{marginBottom: '10px'}">
+                    <Col :md="11" :style="{marginBottom: '10px'}">
                     <Card class="bd-left-true box-amt">
-                        <b class="card-user-infor-name">{{item.examName}}</b>
+                        <b class="card-user-infor-name">{{item.ExamName}}</b>
                         <div class="divide_line"></div>
                         <div class="pd-home-sj">
                             <Row>
                                 <Col span="24">
                                 <div>
-                                    {{item.emStartTime}}到{{item.emEndTime}}
+                                  考试时间：{{fun_gettimev(item.ExamBeginTime)}}到{{fun_gettimev(item.ExamEndTime)}}
                                 </div>
                                 </Col>
                             </Row>
                             <Row>
                                 <Col span="12">
                                 <div>
-                                    总分：{{item.emMark}}
+                                    总分：{{item.TotalScore}}
                                 </div>
                                 </Col>
                             </Row>
                             <Row>
                                 <Col span="12">
                                 <div>
-                                    组卷方式：{{item.rollType}}
+                                    及格分数：{{item.PassScore}}
                                 </div>
                                 </Col>
                             </Row>
                             <Row>
                                 <Col span="12">
                                 <div>
-                                    考试时长：{{item.examTime}}分钟
+                                    组卷方式：{{fun_getassemblytype(item.AssemblyType)}}
+                                </div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="24">
+                                <div>
+                                    考试分类：{{fun_getexamtype(item.ExamType)}}
+                                </div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="24">
+                                <div>
+                                    考试模式：{{fun_getexammode(item.ExamMode)}}
+                                </div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="24">
+                                <div>
+                                    提前交卷时间：{{fun_gettimev(item.AdHandoverTime)}}
+                                </div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="24">
+                                <div>
+                                    最晚迟到时间：{{fun_gettimev(item.LateTime)}}
+                                </div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="12">
+                                <div>
+                                    考试时长：{{item.AnsweTime}}分钟
                                 </div>
                                 </Col>
                                 <Col span="12" class="tx-r">
@@ -77,40 +112,28 @@
 </template>
 
 <script>
+    import {
+        GetHomeExam
+    } from '@/api/home';
+    import util from '@/libs/util';
     export default {
         name: 'home',
         data () {
             return {
-                examlist: [{
-                    examName: '语文考试',
-                    emStartTime: '2018-07-10 17:04',
-                    emEndTime: '2018-07-10 17:04',
-                    emMark: '100',
-                    rollType: '随机组卷',
-                    examTime: '60'
-                }, {
-                    examName: '数学考试',
-                    emStartTime: '2018-07-10 17:04',
-                    emEndTime: '2018-07-10 17:04',
-                    emMark: '150',
-                    rollType: '随机组卷',
-                    examTime: '60'
-                }, {
-                    examName: '英语考试',
-                    emStartTime: '2018-07-10 17:04',
-                    emEndTime: '2018-07-10 17:04',
-                    emMark: '120',
-                    rollType: '随机组卷',
-                    examTime: '60'
-                }, {
-                    examName: '体育考试',
-                    emStartTime: '2018-07-10 17:04',
-                    emEndTime: '2018-07-10 17:04',
-                    emMark: '100',
-                    rollType: '随机组卷',
-                    examTime: '60'
-                }]
+                listQuery: { // 查询条件
+                    ExamType: -1,
+                    Status: -1,
+                    ExamMode: -1,
+                    action: 'getmyexam',
+                    ExamBeginTime: '',
+                    ExamName: ''
+                },
+                examlist: []
             };
+        },
+        // 模板渲染成html前调用，初始化属性
+        created () {
+            this.fetchData();
         },
         mounted () {
             this.$nextTick(() => {
@@ -127,33 +150,35 @@
             }
         },
         methods: {
+            fun_gettimev (v) {
+                return v.substring(v, v.length - 3);
+            },
+            fun_getexamtype (v) {
+                return util.GetItemValue(this, '100004', v); ;
+            },
+            fun_getassemblytype (v) {
+                return util.getAssemblyType(v);
+            },
+            fun_getexammode (v) {
+                return util.getExamModeName(v);
+            },
             fun_startexam (item) {
                 let routeData = this.$router.resolve({
-                    name: 'emstindex',
+                    name: 'emstindex', // graduallyem
                     query: item,
                     params: {}
                 });
                 window.open(routeData.href, '_blank');
             },
-            addNewToDoItem () {
-                this.showAddNewTodo = true;
-            },
-            addNew () {
-                if (this.newToDoItemValue.length !== 0) {
-                    this.toDoList.unshift({
-                        title: this.newToDoItemValue
+            // 刷新数据
+            fetchData () {
+                try {
+                    GetHomeExam(this.listQuery).then(response => {
+                        this.examlist = response.data;
                     });
-                    setTimeout(() => {
-                        this.newToDoItemValue = '';
-                    }, 200);
-                    this.showAddNewTodo = false;
-                } else {
-                    this.$Message.error('请输入待办事项内容');
+                } catch (error) {
+                    console.log(error);
                 }
-            },
-            cancelAdd () {
-                this.showAddNewTodo = false;
-                this.newToDoItemValue = '';
             }
         }
     };

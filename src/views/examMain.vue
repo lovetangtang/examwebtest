@@ -166,8 +166,8 @@
         mounted () {
             this.init();
             this.$nextTick(() => {
-                if (this.$route.query && this.$route.query.examName) {
-                    window.document.title = this.$route.query.examName;
+                if (this.$route.query && this.$route.query.ExamName) {
+                    window.document.title = this.$route.query.ExamName;
                 };
             });
         },

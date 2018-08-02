@@ -2,6 +2,7 @@ import axios from 'axios';
 import env from '../../build/env';
 import semver from 'semver';
 import packjson from '../../package.json';
+import {GetItem} from '@/api/iteminfo';
 
 let util = {
 
@@ -101,25 +102,22 @@ util.setCurrentPath = function (vm, name) {
     });
     let currentPathArr = [];
     if (name === 'home_index') {
-        currentPathArr = [
-            {
-                title: util.handleTitle(vm, util.getRouterObjByName(vm.$store.state.app.routers, 'home_index')),
-                path: '',
-                name: 'home_index'
-            }
-        ];
+        currentPathArr = [{
+            title: util.handleTitle(vm, util.getRouterObjByName(vm.$store.state.app.routers, 'home_index')),
+            path: '',
+            name: 'home_index'
+        }];
     } else if ((name.indexOf('_index') >= 0 || isOtherRouter) && name !== 'home_index') {
-        currentPathArr = [
-            {
-                title: util.handleTitle(vm, util.getRouterObjByName(vm.$store.state.app.routers, 'home_index')),
-                path: '/home',
-                name: 'home_index'
-            },
-            {
-                title: title,
-                path: '',
-                name: name
-            }
+        currentPathArr = [{
+            title: util.handleTitle(vm, util.getRouterObjByName(vm.$store.state.app.routers, 'home_index')),
+            path: '/home',
+            name: 'home_index'
+        },
+        {
+            title: title,
+            path: '',
+            name: name
+        }
         ];
     } else {
         let currentPathObj = vm.$store.state.app.routers.filter(item => {
@@ -139,46 +137,42 @@ util.setCurrentPath = function (vm, name) {
             }
         })[0];
         if (currentPathObj.children.length <= 1 && currentPathObj.name === 'home') {
-            currentPathArr = [
-                {
-                    title: '首页',
-                    path: '',
-                    name: 'home_index'
-                }
-            ];
+            currentPathArr = [{
+                title: '首页',
+                path: '',
+                name: 'home_index'
+            }];
         } else if (currentPathObj.children.length <= 1 && currentPathObj.name !== 'home') {
-            currentPathArr = [
-                {
-                    title: '首页',
-                    path: '/home',
-                    name: 'home_index'
-                },
-                {
-                    title: currentPathObj.title,
-                    path: '',
-                    name: name
-                }
+            currentPathArr = [{
+                title: '首页',
+                path: '/home',
+                name: 'home_index'
+            },
+            {
+                title: currentPathObj.title,
+                path: '',
+                name: name
+            }
             ];
         } else {
             let childObj = currentPathObj.children.filter((child) => {
                 return child.name === name;
             })[0];
-            currentPathArr = [
-                {
-                    title: '首页',
-                    path: '/home',
-                    name: 'home_index'
-                },
-                {
-                    title: currentPathObj.title,
-                    path: '',
-                    name: currentPathObj.name
-                },
-                {
-                    title: childObj.title,
-                    path: currentPathObj.path + '/' + childObj.path,
-                    name: name
-                }
+            currentPathArr = [{
+                title: '首页',
+                path: '/home',
+                name: 'home_index'
+            },
+            {
+                title: currentPathObj.title,
+                path: '',
+                name: currentPathObj.name
+            },
+            {
+                title: childObj.title,
+                path: currentPathObj.path + '/' + childObj.path,
+                name: name
+            }
             ];
         }
     }
@@ -267,6 +261,305 @@ util.checkUpdate = function (vm) {
             });
         }
     });
+};
+util.getSubjectTypeName = function (val) {
+    switch (val) {
+        case 11:
+            return '单选题';
+            break;
+        case 12:
+            return '多选题';
+            break;
+        case 20:
+            return '判断题';
+            break;
+        case 30:
+            return '填空题';
+            break;
+        case 40:
+            return '问答题';
+            break;
+        default:
+            break;
+    }
+};
+
+util.getSubjectModeName = function (val) {
+    switch (val) {
+        case 0:
+            return '模拟试题';
+            break;
+        case 1:
+            return '正式试题';
+            break;
+        default:
+            break;
+    }
+};
+util.getExamModeName = function (val) {
+    switch (val) {
+        case 0:
+            return '模拟考试';
+            break;
+        case 1:
+            return '正式考试';
+            break;
+        default:
+            break;
+    }
+};
+util.getPaperModeName = function (val) {
+    switch (val) {
+        case 0:
+            return '模拟试卷';
+            break;
+        case 1:
+            return '正式试卷';
+            break;
+        default:
+            break;
+    }
+};
+util.getAssemblyType = function (val) {
+    switch (val) {
+        case 10:
+            return '选题组卷';
+            break;
+        case 20:
+            return '抽题组卷';
+            break;
+        case 30:
+            return '随机组卷';
+            break;
+        case 40:
+            return '定向组卷';
+            break;
+        default:
+            break;
+    }
+};
+util.getSubjectDegree = function (val) {
+    switch (val) {
+        case 0:
+            return '简单';
+            break;
+        case 1:
+            return '普通';
+            break;
+        case 2:
+            return '困难';
+            break;
+        default:
+            break;
+    }
+};
+util.getAboutBll = function (val) {
+    switch (val) {
+        case 'GN':
+            return '国内机票';
+            break;
+        case 'GJ':
+            return '国际机票';
+            break;
+        case 'JD':
+            return '酒店';
+            break;
+        case 'LY':
+            return '旅游';
+            break;
+        case 'CL':
+            return '差旅';
+            break;
+        case 'RS':
+            return '国内机票';
+            break;
+        case 'XZ':
+            return '国内机票';
+            break;
+        default:
+            break;
+    }
+};
+
+// 难度集合
+util.DegreeList = [{
+    value: 0,
+    label: '简单'
+},
+{
+    value: 1,
+    label: '普通'
+},
+{
+    value: 2,
+    label: '困难'
+}
+];
+
+util.SubjectClassList = [{
+    value: 11,
+    label: '单选题'
+},
+{
+    value: 12,
+    label: '多选题'
+},
+{
+    value: 20,
+    label: '判断题'
+},
+{
+    value: 30,
+    label: '填空题'
+},
+{
+    value: 40,
+    label: '问答题'
+}
+];
+
+util.sCSearchList = [{
+    value: -1,
+    label: '全部'
+}, {
+    value: 11,
+    label: '单选题'
+},
+{
+    value: 12,
+    label: '多选题'
+},
+{
+    value: 20,
+    label: '判断题'
+},
+{
+    value: 30,
+    label: '填空题'
+},
+{
+    value: 40,
+    label: '问答题'
+}
+];
+
+util.SubjectTypeList = [{
+    value: -1,
+    label: '全部'
+}, {
+    value: 0,
+    label: '简单'
+},
+{
+    value: 1,
+    label: '普通'
+},
+{
+    value: 2,
+    label: '困难'
+}
+];
+
+util.AboutBllList = [{
+    value: 'GN',
+    label: '国内机票'
+}, {
+    value: 'GJ',
+    label: '国际机票'
+}, {
+    value: 'JD',
+    label: '酒店'
+}, {
+    value: 'LY',
+    label: '旅游'
+}, {
+    value: 'CL',
+    label: '差旅'
+}, {
+    value: 'RS',
+    label: '人事'
+}, {
+    value: 'XZ',
+    label: '行政'
+}, {
+    value: 'JS',
+    label: '技术'
+}, {
+    value: 'CW',
+    label: '财务'
+}];
+
+util.AboutBllSearchList = [{
+    value: -1,
+    label: '全部'
+}, {
+    value: 'GN',
+    label: '国内机票'
+}, {
+    value: 'GJ',
+    label: '国际机票'
+}, {
+    value: 'JD',
+    label: '酒店'
+}, {
+    value: 'LY',
+    label: '旅游'
+}, {
+    value: 'CL',
+    label: '差旅'
+}, {
+    value: 'RS',
+    label: '人事'
+}, {
+    value: 'XZ',
+    label: '行政'
+}, {
+    value: 'JS',
+    label: '技术'
+}, {
+    value: 'CW',
+    label: '财务'
+}];
+
+util.GetItemList = function (typeNo, itemNo, isAll) {
+    return new Promise(function (resolve, reject) {
+        GetItem(typeNo, itemNo).then(response => {
+            let list = [];
+            if (response.data !== null) {
+                list = response.data;
+                if (isAll) {
+                    list.unshift({
+                        ItemNo: '-1',
+                        ItemName: '全部'
+                    });
+                };
+            } else {
+                list = [];
+            }
+            resolve(list);
+        });
+    });
+};
+
+util.Letter = ['', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+util.GetItemValue = function (vm, typeNo, itemNo) {
+    let itemlist = vm.$store.state.app.itemList;
+    let value = itemNo;
+    for (let i = 0; i < itemlist.length; i++) {
+        if (itemlist[i].ItemType === typeNo && itemlist[i].ItemNo === itemNo) {
+            value = itemlist[i].ItemName;
+        }
+    }
+    return value;
+};
+
+util.isArrayFn = function (value) {
+    if (typeof Array.isArray === 'function') {
+        return Array.isArray(value);
+    } else {
+        return Object.prototype.toString.call(value) === '[object Array]';
+    }
 };
 
 export default util;
