@@ -219,8 +219,8 @@
                     </div>
                     <div class="box-exame pd-top10">
                         <p class="ft-size15">当前进度</p>
-                        <Circle :percent="10" class="circle-rate">
-                            <span class="demo-Circle-inner" style="font-size:15px">10%</span>
+                        <Circle :percent="percent" class="circle-rate">
+                            <span class="demo-Circle-inner" style="font-size:15px">{{percent}}%</span>
                         </Circle>
                     </div>
                     <Button type="primary" @click="handlersubmit" style="width:100%">提交</Button>
@@ -267,6 +267,53 @@
                 }
             };
         },
+        watch: {
+            'subjectData': {
+                // 深度监听，可监听到对象、数组分值，总题数的变化
+                handler (val, oldVal) {
+                    let sbsum = 0;
+                    let answersum = 0;
+                    let answerlist = [];
+                    for (let i = 0; i < val.length; i++) {
+                        for (let j = 0; j < val[i].subjectlist.length; j++) {
+                            sbsum += 1;
+                            if (val[i].SubjecSubClass === 12) {
+                                if (val[i].subjectlist[j].RightAnswer.length > 0) {
+                                    answersum += 1;
+                                    let json = {
+                                        title: i + 1,
+                                        content: j + 1
+                                    };
+                                    answerlist.push(json);
+                                }
+                            } else if (val[i].SubjecSubClass === 11) {
+                                if (val[i].subjectlist[j].RightAnswer !== -1) {
+                                    answersum += 1;
+                                    let json = {
+                                        title: i + 1,
+                                        content: j + 1
+                                    };
+                                    answerlist.push(json);
+                                }
+                            } else {
+                                if (val[i].subjectlist[j].RightAnswer !== '') {
+                                    answersum += 1;
+                                    let json = {
+                                        title: i + 1,
+                                        content: j + 1
+                                    };
+                                    answerlist.push(json);
+                                }
+                            }
+                        }
+                    }
+                    let percent = Math.ceil((answersum / sbsum) * 100);
+                    this.percent = percent;
+                    console.log(JSON.stringify(answerlist));
+                },
+                deep: true
+            }
+        },
         created () {
             this.fetchData();
         },
@@ -290,7 +337,6 @@
         methods: {
             init () {
                 this.$nextTick(() => {
-                    console.log(222222);
                     let vm = this;
                     for (let i = 1; i < 3; i++) {
                         tinymce.init({

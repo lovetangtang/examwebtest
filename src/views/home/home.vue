@@ -167,7 +167,7 @@
                 let rq = {action: 'execexam', KeyID: item.KeyID};
                 ExecExam(rq).then(response => {
                     let routeData = this.$router.resolve({
-                        name: 'emstindex', // graduallyem
+                        name: 'graduallyem', // graduallyem
                         query: item,
                         params: {}
                     });
