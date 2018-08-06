@@ -60,7 +60,7 @@
             <div class="emrate-time">
               <p class="item-lable"> 剩余时间</p>
               <p class="emrate-tmv">
-                <countdown endTime="1533117600" :callback="callback" endText="已结束"></countdown>
+                <countdown endTime="1533290400" :callback="callback" endText="已结束"></countdown>
               </p>
             </div>
             <div class="item-answer">

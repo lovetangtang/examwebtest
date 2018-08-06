@@ -6,3 +6,11 @@ export function GetHomeExam (params) {
         params
     });
 }
+
+export function ExecExam (params) {
+    return request({
+        url: '/Data/AnswerPaper/exam.ashx',
+        method: 'post',
+        params
+    });
+}

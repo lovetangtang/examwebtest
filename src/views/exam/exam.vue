@@ -9,336 +9,160 @@
             <Row :gutter="50">
                 <Col span="20">
                 <div class="box">
-                    <template v-if="ck in subjectData">
-                        <template v-if="">
-                            
+                    <template v-for="ck in subjectData">
+                        <!-- 单选题 -->
+                        <template v-if="ck.SubjecSubClass===11">
+                            <div class="box-eame-item">
+                                <div class="box-head">
+                                    <p> {{ck.SbTitleName}}(共{{ck.SubtSum}}题，合计{{ck.SubScore}}分,漏选错选不得分)</p>
+                                </div>
+                                <template v-for="(sb,si) in ck.subjectlist">
+                                    <div class="box-content">
+                                        <Row>
+                                            <Col span="22">
+                                            <p class="ft-nm">
+                                                <span class="fc-blue">{{si+1}}.</span>{{sb.Stem}}({{sb.DefaultScore}}分)</p>
+                                            <Form class="examline-bottom" :model="formItem" :label-width="80">
+                                                <RadioGroup v-model="sb.RightAnswer">
+                                                    <template v-for=" (op,oi) in sb.SelectionOption.split('|')">
+                                                        <Radio class="ft-nm margin-top-5 exam-answer" :label="oi+1">{{Letter[oi+1]}}. {{op}} </Radio>
+                                                        </br>
+                                                    </template>
+                                                </RadioGroup>
+                                            </Form>
+                                            </Col>
+                                            <Col span="2">
+                                            <span> 标记</span>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                </template>
+
+                            </div>
                         </template>
+                        <!-- 多选题 -->
+                        <template v-else-if="ck.SubjecSubClass===12">
+                            <div class="box-eame-item">
+                                <div class="box-head">
+                                    <p> {{ck.SbTitleName}}(共{{ck.SubtSum}}题，合计{{ck.SubScore}}分,漏选错选不得分)</p>
+                                </div>
+                                <template v-for="(sb,si) in ck.subjectlist">
+                                    <div class="box-content">
+                                        <Row>
+                                            <Col span="22">
+                                            <p class="ft-nm">
+                                                <span class="fc-blue">{{si+1}}.</span>{{sb.Stem}}({{sb.DefaultScore}}分)</p>
+                                            <Form class="examline-bottom" :model="formItem" :label-width="80">
+                                                <CheckboxGroup v-model="sb.RightAnswer">
+                                                    <template v-for="(op,oi) in sb.SelectionOption.split('|')">
+                                                        <Checkbox class="ft-nm margin-top-5 exam-answer" :label="oi+1">{{Letter[oi+1]}}. {{op}}
+                                                        </Checkbox>
+                                                        </br>
+                                                    </template>
+                                                </CheckboxGroup>
+                                            </Form>
+                                            </Col>
+                                            <Col span="2">
+                                            <span> 标记</span>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                </template>
 
+                            </div>
+                        </template>
+                        <!-- 判断题 -->
+                        <template v-else-if="ck.SubjecSubClass===20">
+                            <div class="box-eame-item">
+                                <div class="box-head">
+                                    <p> {{ck.SbTitleName}}(共{{ck.SubtSum}}题，合计{{ck.SubScore}}分,漏选错选不得分)</p>
+                                </div>
+                                <template v-for="(sb,si) in ck.subjectlist">
+                                    <div class="box-content">
+                                        <Row>
+                                            <Col span="22">
+                                            <p class="ft-nm">
+                                                <span class="fc-blue">{{si+1}}.</span>{{sb.Stem}}({{sb.DefaultScore}}分)</p>
+                                            <Form class="examline-bottom" :model="formItem" :label-width="80">
+                                                <RadioGroup v-model="sb.RightAnswer">
+                                                    <Radio class="ft-nm margin-top-5 exam-answer" label="true">正确 </Radio>
+                                                    </br>
+                                                    <Radio class="ft-nm margin-top-5 exam-answer" label="false">错误</Radio>
+                                                    </br>
+                                                </RadioGroup>
+                                            </Form>
+                                            </Col>
+                                            <Col span="2">
+                                            <span> 标记</span>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                </template>
 
+                            </div>
+                        </template>
+                        <!-- 填空题 -->
+                        <template v-else-if="ck.SubjecSubClass===30">
+                            <div class="box-eame-item">
+                                <div class="box-head">
+                                    <p> {{ck.SbTitleName}}(共{{ck.SubtSum}}题，合计{{ck.SubScore}}分,漏选错选不得分)</p>
+                                </div>
+                                <template v-for="(sb,si) in ck.subjectlist">
+                                    <div class="box-content">
+                                        <Row>
+                                            <Col span="22">
+                                            <p class="ft-nm">
+                                                <span class="fc-blue">{{si+1}}.</span>{{sb.Stem}}({{sb.DefaultScore}}分)</p>
+                                            <Form class="examline-bottom" ref="formInline" :label-width="30">
+                                                <template v-for="(tk,ti) in sb.Stem.split('()').length-1">
+                                                    <div class="margin-bottom-10 margin-top-10">
+                                                        <Input v-model="sb.tkanswer[ti].value">
+                                                        <span slot="prepend">
+                                                            <span>&nbsp;{{ti+1}}&nbsp;</span>
+                                                        </span>
+                                                        </Input>
+                                                    </div>
+                                                </template>
+                                            </Form>
+
+                                            </Col>
+                                            <Col span="2">
+                                            <span> 标记</span>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </template>
+                        <!-- 问答题 -->
+                        <template v-else-if="ck.SubjecSubClass===40">
+                            <div class="box-eame-item">
+                                <div class="box-head">
+                                    <p> {{ck.SbTitleName}}(共{{ck.SubtSum}}题，合计{{ck.SubScore}}分,漏选错选不得分)</p>
+                                </div>
+                                <template v-for="(sb,si) in ck.subjectlist">
+                                    <div class="box-content">
+                                        <Row>
+                                            <Col span="22">
+                                            <p class="ft-nm">
+                                                <span class="fc-blue">{{si+1}}.</span>{{sb.Stem}}({{sb.DefaultScore}}分)</p>
+                                            <Row class="examline-bottom">
+                                                <Col span="11" class="margin-top-10">
+                                                <textarea v-model="sb.RightAnswer" class='tinymce-textarea' :id="'tinymceEditer'+(si+1)"></textarea>
+                                                </Col>
+                                            </Row>
+                                            </Col>
+                                            <Col span="2">
+                                            <span> 标记</span>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </template>
                     </template>
-
-                    <!-- 单选题 -->
-                    <div class="box-eame-item">
-                        <div class="box-head">
-                            <p> 单选题(共1题，合计20.0分)</p>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span> 一般性的拜访多以（）为最佳交往时间。(20.0分)</p>
-                                <Form class="examline-bottom" :model="formItem" :label-width="80">
-                                    <RadioGroup v-model="formItem.radio">
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="A">A. 1小时左右 </Radio>
-                                        </br>
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="B">B. 半小时左右 </Radio>
-                                        </br>
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="C">C. 十分钟左右 </Radio>
-                                        </br>
-                                    </RadioGroup>
-                                </Form>
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span> 一般性的拜访多以（）为最佳交往时间。(20.0分)</p>
-                                <Form class="line-bottom examline-bottom" :model="formItem" :label-width="80">
-                                    <RadioGroup v-model="formItem.radio">
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="A">A. 1小时左右 </Radio>
-                                        </br>
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="B">B. 半小时左右 </Radio>
-                                        </br>
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="C">C. 十分钟左右 </Radio>
-                                        </br>
-                                    </RadioGroup>
-                                </Form>
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                    </div>
-
-                    <!-- 多选题 -->
-                    <div class="box-eame-item">
-                        <div class="box-head">
-                            <p> 多选题(共1题，合计20.0分，漏选错选不得分)</p>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span>
-                                    以目的的不同为标准划分的拜访类型有 (20.0分)
-                                </p>
-                                <Form class="examline-bottom" :model="formItem" :label-width="80">
-                                    <CheckboxGroup v-model="formItem.checkbox">
-                                        <Checkbox class="ft-nm margin-top-5 exam-answer" label="A">A. 商业拜访
-                                        </Checkbox>
-                                        </br>
-                                        <Checkbox class="ft-nm margin-top-5 exam-answer" label="B">B. 政治拜访
-                                        </Checkbox>
-                                        </br>
-                                        <Checkbox class="ft-nm margin-top-5 exam-answer" label="C">C. 情感拜访
-                                        </Checkbox>
-                                        </br>
-                                        <Checkbox class="ft-nm margin-top-5 exam-answer" label="C">D. 礼节性拜访
-                                        </Checkbox>
-                                        </br>
-                                    </CheckboxGroup>
-                                </Form>
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span>
-                                    以目的的不同为标准划分的拜访类型有 (20.0分)
-                                </p>
-                                <Form class="examline-bottom" :model="formItem" :label-width="80">
-                                    <CheckboxGroup v-model="formItem.checkbox">
-                                        <Checkbox class="ft-nm margin-top-5 exam-answer" label="A">A. 商业拜访
-                                        </Checkbox>
-                                        </br>
-                                        <Checkbox class="ft-nm margin-top-5 exam-answer" label="B">B. 政治拜访
-                                        </Checkbox>
-                                        </br>
-                                        <Checkbox class="ft-nm margin-top-5 exam-answer" label="C">C. 情感拜访
-                                        </Checkbox>
-                                        </br>
-                                        <Checkbox class="ft-nm margin-top-5 exam-answer" label="C">D. 礼节性拜访
-                                        </Checkbox>
-                                        </br>
-                                    </CheckboxGroup>
-                                </Form>
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                    </div>
-
-                    <!-- 填空题 -->
-                    <div class="box-eame-item">
-                        <div class="box-head">
-                            <p> 填空题(共1题，合计20.0分)</p>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22" class="exam-pdlr25">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span>
-                                    打招呼的方式一般有（）（）（）（） (20.0分)
-                                </p>
-                                <Row>
-                                    <Col span="22" class="margin-top-20">
-                                    <Form class="examline-bottom" ref="formInline" :label-width="30">
-                                        <div class="margin-bottom-10">
-                                            <Input>
-                                            <span slot="prepend">
-                                                <span>&nbsp;1&nbsp;</span>
-                                            </span>
-                                            </Input>
-                                        </div>
-                                        <div class="margin-bottom-10">
-                                            <Input>
-                                            <span slot="prepend">
-                                                <span>&nbsp;2&nbsp;</span>
-                                            </span>
-                                            </Input>
-                                        </div>
-                                        <div class="margin-bottom-10">
-                                            <Input>
-                                            <span slot="prepend">
-                                                <span>&nbsp;3&nbsp;</span>
-                                            </span>
-                                            </Input>
-                                        </div>
-                                        <div class="margin-bottom-10">
-                                            <Input>
-                                            <span slot="prepend">
-                                                <span>&nbsp;4&nbsp;</span>
-                                            </span>
-                                            </Input>
-                                        </div>
-                                        <!-- <FormItem label="（1）">
-                                        <Input placeholder=""></Input>
-                                    </FormItem>
-                                    <FormItem label="（2）">
-                                        <Input placeholder=""></Input>
-                                    </FormItem>
-                                    <FormItem label="（3）">
-                                        <Input placeholder=""></Input>
-                                    </FormItem>
-                                    <FormItem label="（4）">
-                                        <Input placeholder=""></Input>
-                                    </FormItem> -->
-                                    </Form>
-                                    </Col>
-                                </Row>
-
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22" class="exam-pdlr25">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span>
-                                    打招呼的方式一般有（）（）（）（） (20.0分)
-                                </p>
-                                <Row>
-                                    <Col span="22" class="margin-top-20">
-                                    <Form class="examline-bottom" ref="formInline" :label-width="30">
-                                        <div class="margin-bottom-10">
-                                            <Input>
-                                            <span slot="prepend">
-                                                <span>&nbsp;1&nbsp;</span>
-                                            </span>
-                                            </Input>
-                                        </div>
-                                        <div class="margin-bottom-10">
-                                            <Input>
-                                            <span slot="prepend">
-                                                <span>&nbsp;2&nbsp;</span>
-                                            </span>
-                                            </Input>
-                                        </div>
-                                        <div class="margin-bottom-10">
-                                            <Input>
-                                            <span slot="prepend">
-                                                <span>&nbsp;3&nbsp;</span>
-                                            </span>
-                                            </Input>
-                                        </div>
-                                        <div class="margin-bottom-10">
-                                            <Input>
-                                            <span slot="prepend">
-                                                <span>&nbsp;4&nbsp;</span>
-                                            </span>
-                                            </Input>
-                                        </div>
-                                    </Form>
-                                    </Col>
-                                </Row>
-
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                    </div>
-
-                    <!-- 判断题 -->
-                    <div class="box-eame-item">
-                        <div class="box-head">
-                            <p>判断题(共1题，合计20.0分)</p>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22" class="exam-pdlr25">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span>
-                                    与他人交谈完毕就可以立即转身离开。 (20.0分)
-                                </p>
-
-                                <Form class="examline-bottom" :model="formItem" :label-width="80">
-                                    <RadioGroup v-model="formItem.radio">
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="A">正确 </Radio>
-                                        </br>
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="B">错误</Radio>
-                                        </br>
-                                    </RadioGroup>
-                                </Form>
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22" class="exam-pdlr25">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span>
-                                    与他人交谈完毕就可以立即转身离开。 (20.0分)
-                                </p>
-
-                                <Form class="examline-bottom" :model="formItem" :label-width="80">
-                                    <RadioGroup v-model="formItem.radio">
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="A">正确 </Radio>
-                                        </br>
-                                        <Radio class="ft-nm margin-top-5 exam-answer" label="B">错误</Radio>
-                                        </br>
-                                    </RadioGroup>
-                                </Form>
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                    </div>
-
-                    <!-- 问答题 -->
-                    <div class="box-eame-item">
-                        <div class="box-head">
-                            <p> 问答题(共1题，合计20.0分)</p>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22" class="exam-pdlr25">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span>
-                                    请简单说一下你对老唐帅气的理解。 (20.0分)
-                                </p>
-                                <Row class="examline-bottom">
-                                    <Col span="11" class="margin-top-10">
-                                    <textarea class='tinymce-textarea' id="tinymceEditer1"></textarea>
-                                    </Col>
-                                </Row>
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                        <div class="box-content">
-                            <Row>
-                                <Col span="22" class="exam-pdlr25">
-                                <p class="ft-nm">
-                                    <span class="fc-blue">1.</span>
-                                    请简单说一下你对老唐帅气的理解。 (20.0分)
-                                </p>
-                                <Row class="examline-bottom">
-                                    <Col span="11" class="margin-top-10 ">
-                                    <textarea class='tinymce-textarea ' id="tinymceEditer2"></textarea>
-                                    </Col>
-                                </Row>
-                                </Col>
-                                <Col span="2">
-                                <span> 标记</span>
-                                </Col>
-                            </Row>
-                        </div>
-                    </div>
                 </div>
                 </Col>
                 <Col :md="4" style="padding-left:39px">
@@ -347,7 +171,7 @@
                         <div class="emrate-time">
                             <p class="item-lable"> 剩余时间</p>
                             <p class="emrate-tmv">
-                                <countdown endTime="1533121920" :callback="callback" endText="已结束"></countdown>
+                                <countdown :endTime="Examinfo.endTime" ref="countdown" :callback="callback" endText="已结束"></countdown>
                             </p>
                         </div>
                         <div class="item-answer">
@@ -416,9 +240,11 @@
 <script>
     import tinymce from 'tinymce';
     import {
-        GetAwExamList
+        GetAwExamList,
+        SaveAnswer
     } from '@/api/awexam';
     import countdown from './countdown.vue';
+    import util from '@/libs/util';
     export default {
         name: 'exam',
         components: {
@@ -428,11 +254,13 @@
             return {
                 ansmodal: false,
                 pageSpinShow: true,
+                Letter: util.Letter,
                 subjectData: [],
                 listQuery: {
                     action: 'getawexamlist',
                     KeyID: 0
                 },
+                Examinfo: {},
                 formItem: {
                     radio: 'male',
                     checkbox: []
@@ -462,6 +290,7 @@
         methods: {
             init () {
                 this.$nextTick(() => {
+                    console.log(222222);
                     let vm = this;
                     for (let i = 1; i < 3; i++) {
                         tinymce.init({
@@ -492,15 +321,64 @@
             fetchData () {
                 try {
                     let KeyID = this.$route.query.KeyID;
-                    console.log(this.$route.query.KeyID);
                     this.listQuery.KeyID = KeyID;
                     GetAwExamList(this.listQuery).then(response => {
                         this.subjectData = response.data;
+                        this.Examinfo = response.data1;
+                        let dt = new Date(this.Examinfo.ExamEndTime);
+                        let timc = dt.valueOf() + ''; // .substring(0, dt.valueOf().length - 3);
+                        timc = timc.substring(0, timc.length - 3);
+                        this.Examinfo.ExamEndTime = timc;
+                        this.$refs.countdown.setEndTime(timc);
+                        for (let i = 0; i < this.subjectData.length; i++) {
+                            let scls = this.subjectData[i].SubjecSubClass;
+                            switch (scls) {
+                                case 11:
+                                    for (let j = 0; j < this.subjectData[i].subjectlist.length; j++) {
+                                        let json = this.subjectData[i].subjectlist[j];
+                                        json.RightAnswer = -1;
+                                    }
+                                    break;
+                                case 12:
+                                    for (let j = 0; j < this.subjectData[i].subjectlist.length; j++) {
+                                        let json = this.subjectData[i].subjectlist[j];
+                                        json.RightAnswer = [];
+                                    }
+                                    break;
+                                case 20:
+
+                                    break;
+                                case 30:
+                                    for (let j = 0; j < this.subjectData[i].subjectlist.length; j++) {
+                                        let json = this.subjectData[i].subjectlist[j];
+                                        json['tkanswer'] = [];
+                                        let len = json.Stem.split('()').length - 1;
+                                        for (let h = 0; h < len; h++) {
+                                            json.tkanswer.push({
+                                                value: ''
+                                            });
+                                        }
+                                        this.subjectData[i].subjectlist[j] = json;
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        this.init();
+                    }).catch(ex => {
+                        console.log(ex);
+                        this.$Spin.hide();
+                        // this.$router.push({
+                        //     name: 'examresindex',
+                        //     query: []
+                        // });
                     });
                 } catch (error) {
                     console.log(error);
                 }
             },
+            // 请求后台提交试卷
             fun_submitexam () {
                 this.$Spin.show({
                     render: (h) => {
@@ -516,15 +394,50 @@
                         ]);
                     }
                 });
-                setTimeout(() => {
+
+                let examanswer = {
+                    ExamID: this.listQuery.KeyID,
+                    action: 'saveanswer',
+                    answerlist: []
+                };
+                let sbdata = this.subjectData;
+                for (let i = 0; i < sbdata.length; i++) {
+                    for (let j = 0; j < sbdata[i].subjectlist.length; j++) {
+                        let answer = sbdata[i].subjectlist[j];
+                        let json = {
+                            SubjectID: answer.KeyID,
+                            RightAnswer: answer.RightAnswer,
+                            SubjecSubClass: sbdata[i].SubjecSubClass,
+                            tkanswer: JSON.stringify(answer.tkanswer),
+                            CkClassID: sbdata[i].CkClassID
+                        };
+                        if (sbdata[i].SubjecSubClass === 12) {
+                            json.RightAnswer = json.RightAnswer.join('|');
+                        }
+                        examanswer.answerlist.push(json);
+                    }
+                }
+                examanswer.answerlist = JSON.stringify(examanswer.answerlist);
+                SaveAnswer(examanswer).then(response => {
+                    this.$Notice.success({
+                        title: '提交成功',
+                        desc: '',
+                        duration: 2
+                    });
+                    let query = {
+                        config: JSON.stringify(response.data),
+                        score: response.value
+                    };
                     this.$Spin.hide();
                     this.$router.push({
                         name: 'examresindex',
-                        query: []
+                        query: query
                     });
-                }, 3000);
+                });
+                this.$Spin.hide();
             },
             callback (v) {
+                return;
                 this.$Modal.confirm({
                     title: '确认交卷',
                     'mask-closable': 'false',
@@ -547,12 +460,9 @@
                     'mask-closable': 'false',
                     content: '<p style="font-size:18px">当前题目还未答完，是否确认交卷</p>',
                     onOk: () => {
-                        this.$Message.info('Clicked ok');
                         this.fun_submitexam();
                     },
-                    onCancel: () => {
-                        this.$Message.info('Clicked cancel');
-                    }
+                    onCancel: () => {}
                 });
             }
         }

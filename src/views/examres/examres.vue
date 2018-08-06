@@ -7,15 +7,20 @@
         <div class="content-wrapper content-top">
             <div class="score-wrapper">
                 <img class="score-bg" src="../../images/score-bg.png">
-                <!-- <span class="score-left ">99</span>
-                <span class="score-right">.02</span>
-                <span class="score-unit">分</span> -->
-                <span class="score-unit">答题结束</span>
+                <template v-if="showConfig.IsShowScore===true">
+                    <span class="score-left ">{{score}}</span>
+                    <!-- <span class="score-right">.02</span> -->
+                    <span class="score-unit">分</span>
+                </template>
+                <template v-else>
+                    <span class="score-unit">答题结束</span>
+                </template>
             </div>
             <div class="release-wrapper">
                 <span class="release-str"></span>
             </div>
             <div class="decoration">
+                <span>{{showConfig.EndTag}}</span>
                 <img src="../../images/decoration.png">
             </div>
         </div>
@@ -32,10 +37,14 @@
             <div>
                 <Row class="margin-top-70" :gutter="50">
                     <Col span="12">
-                    <Button class="maxwidth  btn-light-blue" @click="handlerexamresolve"  shape="circle" size="large">查看解析</Button>
+                    <template :style="{display:showstatus.IsShowLook}">
+                        <Button class="maxwidth  btn-light-blue" @click="handlerexamresolve" shape="circle" size="large">查看解析</Button>
+                    </template>
                     </Col>
                     <Col span="12">
-                    <Button class="maxwidth" @click="handlerrestexam" type="primary" shape="circle" size="large">再考一次</Button>
+                    <template :style="{display:showstatus.IsShowRfExam}">
+                        <Button class="maxwidth" @click="handlerrestexam" type="primary" shape="circle" size="large">再考一次</Button>
+                    </template>
                     </Col>
                 </Row>
             </div>
@@ -48,6 +57,16 @@
         data () {
             return {
                 ansmodal: false,
+                showConfig: {},
+                score: 0,
+                showstatus: {
+                    IsShowScore: 'none',
+                    IsShowAnswer: 'none',
+                    IsShowNum: 'none',
+                    IsShowComment: 'none',
+                    IsShowRfExam: 'none',
+                    IsShowLook: 'none'
+                },
                 formItem: {
                     radio: 'male',
                     checkbox: []
@@ -65,6 +84,11 @@
             avatorPath () {
                 return localStorage.avatorImgPath;
             }
+        },
+        created () {
+            let query = this.$route.query;
+            this.showConfig = JSON.parse(query.config);
+            this.score = JSON.parse(query.score);
         },
         methods: {
             init () {

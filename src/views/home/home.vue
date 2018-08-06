@@ -113,7 +113,8 @@
 
 <script>
     import {
-        GetHomeExam
+        GetHomeExam,
+        ExecExam
     } from '@/api/home';
     import util from '@/libs/util';
     export default {
@@ -163,12 +164,15 @@
                 return util.getExamModeName(v);
             },
             fun_startexam (item) {
-                let routeData = this.$router.resolve({
-                    name: 'emstindex', // graduallyem
-                    query: item,
-                    params: {}
+                let rq = {action: 'execexam', KeyID: item.KeyID};
+                ExecExam(rq).then(response => {
+                    let routeData = this.$router.resolve({
+                        name: 'emstindex', // graduallyem
+                        query: item,
+                        params: {}
+                    });
+                    window.open(routeData.href, '_blank');
                 });
-                window.open(routeData.href, '_blank');
             },
             // 刷新数据
             fetchData () {

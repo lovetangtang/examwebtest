@@ -10,7 +10,8 @@
       name: 'countdown',
       data () {
           return {
-              content: ''
+              content: '',
+              editTime: 0
           };
       },
       props: {
@@ -31,6 +32,11 @@
           this.countdowm(this.endTime);
       },
       methods: {
+          // 设置
+          setEndTime (time) {
+              this.endTime = time;
+              this.countdowm(this.endTime);
+          },
           countdowm (timestamp) {
               let self = this;
               let timer = setInterval(function () {

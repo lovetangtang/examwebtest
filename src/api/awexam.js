@@ -6,3 +6,11 @@ export function GetAwExamList (params) {
         params
     });
 }
+
+export function SaveAnswer (params) {
+    return request({
+        url: '/Data/AnswerPaper/exam.ashx',
+        method: 'post',
+        params
+    });
+}
