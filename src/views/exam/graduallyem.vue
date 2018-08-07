@@ -110,7 +110,7 @@
             <div class="emrate-time">
               <p class="item-lable"> 剩余时间</p>
               <p class="emrate-tmv">
-                <countdown ref="countdown" :endTime="1533551400" :callback="callback" endText="已结束"></countdown>
+                <countdown ref="countdown" :endTime="Examinfo.ExamEndTime" :callback="callback" endText="已结束"></countdown>
               </p>
             </div>
             <div class="item-answer">
@@ -464,6 +464,8 @@
               this.$Spin.hide();
           },
           callback (v) {
+              console.log('到时间了');
+              return;
               this.$Modal.confirm({
                   title: '确认交卷',
                   'mask-closable': 'false',

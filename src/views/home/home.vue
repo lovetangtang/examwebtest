@@ -28,7 +28,7 @@
             <Row class-name="home-page-row1" :gutter="10">
                 <template v-for="item in examlist">
                     <Col :md="11" :style="{marginBottom: '10px'}">
-                    <Card class="bd-left-true box-amt">
+                    <Card class="bd-left-true box-amt ">
                         <b class="card-user-infor-name">{{item.ExamName}}</b>
                         <div class="divide_line"></div>
                         <div class="pd-home-sj">

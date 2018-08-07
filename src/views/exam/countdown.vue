@@ -62,7 +62,7 @@
                           format = `${min}分${sec}秒`;
                       }
                       self.content = format;
-                  } else {
+                  } else if (timestamp !== '') {
                       clearInterval(timer);
                       self.content = self.endText;
                       self._callback();
