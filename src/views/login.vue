@@ -40,6 +40,7 @@
 <script>
 import Cookies from 'js-cookie';
 import {GetItem} from '@/api/iteminfo';
+import {login} from '@/api/login';
 export default {
     data () {
         return {
@@ -61,24 +62,25 @@ export default {
         handleSubmit () {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    GetItem().then(response => {
+                    Cookies.set('user', this.form.userName);
+                    login(this.form.userName, this.form.password, 'RTX').then(response => {
+                        this.$router.push({
+                            name: 'home_index'
+                        });
+                        return GetItem();
+                    }).then(response => {
                         let list = [];
                         if (response.data !== null) {
                             list = response.data;
                         }
                         this.$store.commit('setItemList', list);
                     });
-                    Cookies.set('user', this.form.userName);
-                    Cookies.set('password', this.form.password);
                     this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
                     if (this.form.userName === 'iview_admin') {
                         Cookies.set('access', 0);
                     } else {
                         Cookies.set('access', 1);
                     }
-                    this.$router.push({
-                        name: 'home_index'
-                    });
                 }
             });
         }

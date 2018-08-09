@@ -3,7 +3,7 @@
     @import "./exam.less";
 </style>
 <template>
-    <div>
+    <div @click="handleFullscreen">
         <Row class="mg-top20" type="flex" justify="center">
             <Col span="18">
             <Row :gutter="50">
@@ -183,36 +183,16 @@
                                     <p class="tx-c">
                                         <span class="ft-size16 tx-c">答题卡</span>
                                     </p>
-                                    <div>
-                                        <p class="margin-top-20 head-bm-line">
-                                            <span>单选题(共1题，合计20.0分)</span>
-                                        </p>
-                                        <p>1已答</p>
-                                    </div>
-                                    <div>
-                                        <p class="margin-top-20 head-bm-line">
-                                            <span>多选题(共1题，合计20.0分，漏选错选不得分)</span>
-                                        </p>
-                                        <p>1已答</p>
-                                    </div>
-                                    <div>
-                                        <p class="margin-top-20 head-bm-line">
-                                            <span>填空题(共1题，合计20.0分)</span>
-                                        </p>
-                                        <p>1已答</p>
-                                    </div>
-                                    <div>
-                                        <p class="margin-top-20 head-bm-line">
-                                            <span>判断题(共1题，合计20.0分)</span>
-                                        </p>
-                                        <p>1已答</p>
-                                    </div>
-                                    <div>
-                                        <p class="margin-top-20 head-bm-line">
-                                            <span>问答题(共1题，合计20.0分)</span>
-                                        </p>
-                                        <p>1已答</p>
-                                    </div>
+                                    <template v-for="(at,ai) in answerCardlist">
+                                        <div>
+                                            <p class="margin-top-20 head-bm-line">
+                                                <span>{{at.SbTitleName}}(共{{at.SubtSum}}题，合计{{at.SubScore}}分)</span>
+                                            </p>
+                                            <template   v-for="c in at.content">
+                                                <label class="margin-top-10">{{c}}题已答</label>&nbsp;&nbsp;
+                                            </template>
+                                        </div>
+                                    </template>
                                 </div>
                             </Modal>
                         </div>
@@ -256,6 +236,9 @@
                 pageSpinShow: true,
                 Letter: util.Letter,
                 subjectData: [],
+                exitScreenTime: 0,
+                isValidScree: true,
+                answerCardlist: [],
                 listQuery: {
                     action: 'getawexamlist',
                     KeyID: 0
@@ -275,41 +258,37 @@
                     let answersum = 0;
                     let answerlist = [];
                     for (let i = 0; i < val.length; i++) {
+                        let aslist = {
+                            title: i + 1,
+                            SbTitleName: val[i].SbTitleName,
+                            content: [],
+                            SubtSum: val[i].SubtSum,
+                            SubScore: val[i].SubScore
+                        };
                         for (let j = 0; j < val[i].subjectlist.length; j++) {
                             sbsum += 1;
                             if (val[i].SubjecSubClass === 12) {
                                 if (val[i].subjectlist[j].RightAnswer.length > 0) {
                                     answersum += 1;
-                                    let json = {
-                                        title: i + 1,
-                                        content: j + 1
-                                    };
-                                    answerlist.push(json);
+                                    aslist['content'].push(j + 1);
                                 }
                             } else if (val[i].SubjecSubClass === 11) {
                                 if (val[i].subjectlist[j].RightAnswer !== -1) {
                                     answersum += 1;
-                                    let json = {
-                                        title: i + 1,
-                                        content: j + 1
-                                    };
-                                    answerlist.push(json);
+                                    aslist['content'].push(j + 1);
                                 }
                             } else {
                                 if (val[i].subjectlist[j].RightAnswer !== '') {
                                     answersum += 1;
-                                    let json = {
-                                        title: i + 1,
-                                        content: j + 1
-                                    };
-                                    answerlist.push(json);
+                                    aslist['content'].push(j + 1);
                                 }
                             }
                         }
+                        answerlist.push(aslist);
                     }
                     let percent = Math.ceil((answersum / sbsum) * 100);
                     this.percent = percent;
-                    console.log(JSON.stringify(answerlist));
+                    this.answerCardlist = answerlist;
                 },
                 deep: true
             }
@@ -319,6 +298,7 @@
         },
         mounted () {
             this.init();
+            window.addEventListener('resize', this.handleExitScree);
             setTimeout(() => {
                 this.pageSpinShow = false;
             }, 2000);
@@ -371,11 +351,12 @@
                     GetAwExamList(this.listQuery).then(response => {
                         this.subjectData = response.data;
                         this.Examinfo = response.data1;
-                        let dt = new Date(this.Examinfo.ExamEndTime);
+                        let dt = new Date(response.value);
                         let timc = dt.valueOf() + ''; // .substring(0, dt.valueOf().length - 3);
                         timc = timc.substring(0, timc.length - 3);
-                        this.Examinfo.ExamEndTime = timc;
-                        this.$refs.countdown.setEndTime(timc);
+                        let addtime = response.data1.AnsweTime * 60;
+                        this.Examinfo.ExamEndTime = parseInt(timc) + addtime;
+                        this.$refs.countdown.setEndTime(this.Examinfo.ExamEndTime);
                         for (let i = 0; i < this.subjectData.length; i++) {
                             let scls = this.subjectData[i].SubjecSubClass;
                             switch (scls) {
@@ -423,6 +404,76 @@
                 } catch (error) {
                     console.log(error);
                 }
+            },
+            // 页面切换限制
+            handleExitScree (type) {
+                if (this.isValidScree) {
+                    if (!this.checkFull()) {
+                        this.exitScreenTime += 1;
+                        this.$Modal.confirm({
+                            title: '题型',
+                            'mask-closable': 'false',
+                            content: '<p style="font-size:18px">页面已切换' + this.exitScreenTime + '次,超过一定次数将自动提交试卷</p>',
+                            onOk: () => {
+                            },
+                            onCancel: () => {
+                            }
+                        });
+                        // 要执行的动作
+                        if (this.Examinfo.SwitchNumLimit > 0) {
+                            if (this.exitScreenTime > this.Examinfo.SwitchNumLimit) {
+                                this.$Modal.confirm({
+                                    title: '确认交卷',
+                                    'mask-closable': 'false',
+                                    content: '<p style="font-size:18px">页面切换超过限制，系统将在3秒后自动交卷</p>',
+                                    onOk: () => {
+                                        this.$Message.info('Clicked ok');
+                                    },
+                                    onCancel: () => {
+                                        this.$Message.info('Clicked cancel');
+                                    }
+                                });
+                                setTimeout(() => {
+                                    this.$Modal.remove();
+                                    this.fun_submitexam();
+                                }, 3000);
+                            }
+                        }
+                    }
+                }
+            },
+            // 点击全屏
+            handleFullscreen () {
+                let main = document.body;
+                if (this.Fullscreen) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitCancelFullScreen) {
+                        document.webkitCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                } else {
+                    if (main.requestFullscreen) {
+                        main.requestFullscreen();
+                    } else if (main.mozRequestFullScreen) {
+                        main.mozRequestFullScreen();
+                    } else if (main.webkitRequestFullScreen) {
+                        main.webkitRequestFullScreen();
+                    } else if (main.msRequestFullscreen) {
+                        main.msRequestFullscreen();
+                    }
+                }
+            },
+            // 检查是否全屏
+            checkFull () {
+                var isFull = document.fullscreenEnabled || window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+
+                // to fix : false || undefined == undefined
+                if (isFull === undefined) isFull = false;
+                return isFull;
             },
             // 请求后台提交试卷
             fun_submitexam () {
@@ -474,6 +525,7 @@
                         config: JSON.stringify(response.data),
                         score: response.value
                     };
+                    this.isValidScree = false;
                     this.$Spin.hide();
                     this.$router.push({
                         name: 'examresindex',

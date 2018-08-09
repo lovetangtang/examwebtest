@@ -5,8 +5,8 @@ export function login (username, password, type) {
         url: '/Data/Login.ashx',
         method: 'post',
         data: {
-            username,
-            password,
+            userName: username,
+            pwd: password,
             type,
             action: 'userLogin'
         }

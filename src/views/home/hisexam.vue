@@ -4,32 +4,26 @@
 </style>
 <template>
     <div class="home-main mg-top">
-        <Row>
-            <Col span="20" class="ft-lg">当前考试</Col>
+        <Row class="mg-top">
+            <Col span="20" class="ft-lg">历史考试</Col>
             <Col span="4" class="ft-cs">
-            <!-- <Dropdown class="fl-right">
-                <a href="javascript:void(0)">
-                    全部考试
-                    <Icon type="arrow-down-b"></Icon>
-                </a>
-                <DropdownMenu slot="list">
-                    <DropdownItem>驴打滚</DropdownItem>
-                    <DropdownItem>炸酱面</DropdownItem>
-                    <DropdownItem disabled>豆汁儿</DropdownItem>
-                    <DropdownItem>冰糖葫芦</DropdownItem>
-                    <DropdownItem divided>北京烤鸭</DropdownItem>
-                </DropdownMenu>
-            </Dropdown> -->
+            <div class="fl-right" @click="handleOpenExam">
+                <!-- <a href="javascript:void(0)">
+                    全部考试>
+                </a> -->
+            </div>
             </Col>
         </Row>
         <div class="divide_line1"></div>
         <Row :gutter="12">
             <Col :xs="24">
             <Row class-name="home-page-row1" :gutter="10">
-                <template v-for="item in examlist">
+                <template v-for="item in examlately">
                     <Col :md="11" :style="{marginBottom: '10px'}">
-                    <Card class="bd-left-true box-amt ">
+                    <Card class="bd-left-true box-amt paper-bg">
                         <b class="card-user-infor-name">{{item.ExamName}}</b>
+                        <b style="color:#ff9900">100分</b>
+                         <b class="scoredetail" @click="handleopenscore(item)">成绩详情</b>
                         <div class="divide_line"></div>
                         <div class="pd-home-sj">
                             <Row>
@@ -46,7 +40,7 @@
                                 </div>
                                 </Col>
                             </Row>
-                             <Row>
+                            <Row>
                                 <Col span="12">
                                 <div>
                                     考试次数限制：{{item.AnsweNumLimit===-1?'无限制':item.AnsweNumLimit}}
@@ -102,19 +96,9 @@
                                 </div>
                                 </Col>
                                 <Col span="12" class="tx-r">
-                                <Button type="primary" class="mg-btm" @click="fun_startexam(item)">开始</Button>
+                                <span>{{fun_getExamStatus(item.ExamStatus)}}</span>
                                 </Col>
                             </Row>
-                        </div>
-                    </Card>
-                    </Col>
-                </template>
-                <template v-if="examlist.length===0">
-                    <Col :md="11" :style="{marginBottom: '10px'}">
-                    <Card class="bd-left-true box-amt paper-bg">
-                        <b class="card-user-infor-name"></b>
-                        <div class="pd-home-sj">
-                            暂无正在进行的考试
                         </div>
                     </Card>
                     </Col>
@@ -123,15 +107,16 @@
             </Col>
             </Col>
         </Row>
-
-
+        <!-- 组卷方式窗口 -->
+        <Modal   ok-text="确定" v-model="scoremodal" width="900" >
+          <Table border :columns="columns" :data="scoreData"></Table>
+        </Modal>
     </div>
 </template>
 
 <script>
     import {
-        GetHomeExam,
-        ExecExam
+        GetHomeExam
     } from '@/api/home';
     import util from '@/libs/util';
     export default {
@@ -146,7 +131,57 @@
                     type: 'now',
                     ExamName: ''
                 },
-                examlist: []
+                scoremodal: false,
+                scoreData: [],
+                columns: [
+                    {
+                        title: '考试状态',
+                        key: 'ExamStatus',
+                        render: (h, params) => {
+                            let sc = params.row.ExamStatus;
+                            let v = this.fun_getExamStatus(sc);
+                            return v;
+                        }
+                    }, {
+                        title: '是否及格',
+                        key: 'IsPass',
+                        render: (h, params) => {
+                            let sc = params.row.IsPass;
+                            let v = this.fun_getispass(sc);
+                            return v;
+                        }
+                    }, {
+                        title: '答题次数',
+                        key: 'ReplyNum'
+                    }, {
+                        title: '交卷时间',
+                        key: 'SubmitTime'
+                    }, {
+                        title: '答卷时间',
+                        key: 'AnswerTime'
+                    }, {
+                        title: '系统判分',
+                        key: 'JudgmentStatus',
+                        render: (h, params) => {
+                            let sc = params.row.JudgmentStatus;
+                            let v = this.fun_getJudgmentStatus(sc);
+                            return v;
+                        }
+                    }, {
+                        title: '人工判分',
+                        key: 'IsJudgment',
+                        render: (h, params) => {
+                            let sc = params.row.IsJudgment;
+                            let v = this.fun_getIsJudgment(sc);
+                            return v;
+                        }
+                    }, {
+                        title: '分数',
+                        key: 'Score'
+                    }
+                ],
+                examnowlist: [],
+                examlately: []
             };
         },
         // 模板渲染成html前调用，初始化属性
@@ -180,37 +215,105 @@
             fun_getexammode (v) {
                 return util.getExamModeName(v);
             },
-            // 获取考试次数限制
-            fun_getanswenumlimit (v) {
+            // 获取答题状态
+            fun_getispass (v) {
+                switch (v) {
+                    case false:
+                        return '未及格';
+                        break;
+                    case true:
+                        return '及格';
+                        break;
+                    default:
+                        break;
+                }
+            },
+            // 获取考试状态状态
+            fun_getExamStatus (v) {
+                switch (v) {
+                    case 0:
+                        return '未判分';
+                        break;
+                    case 1:
+                        return '通过';
+                        break;
+                    case 2:
+                        return '未通过';
+                        break;
+                    default:
+                        break;
+                }
+            },
+            // 系统评分状态
+            fun_getJudgmentStatus (v) {
+                switch (v) {
+                    case 0:
+                        return '未判分';
+                        break;
+                    case 1:
+                        return '判分成功';
+                        break;
+                    case 2:
+                        return '判分失败';
+                        break;
+                    default:
+                        break;
+                }
+            },
+            // 系统评分状态
+            fun_getIsJudgment (v) {
+                switch (v) {
+                    case false:
+                        return '未判分';
+                        break;
+                    case true:
+                        return '判分成功';
+                        break;
+                    default:
+                        break;
+                }
+            },
+            // 获取答题状态
+            fun_getanswerstatus (v) {
+                switch (v) {
+                    case 0:
+                        return '未答题';
+                        break;
+                    case 1:
+                        return '答题中';
+                        break;
+                    case 2:
+                        return '待强制交卷';
+                        break;
+                    case 3:
+                        return '答题完成';
+                        break;
+                    default:
+                        break;
+                }
             },
             fun_startexam (item) {
-                let rq = {
-                    action: 'execexam',
-                    KeyID: item.KeyID
-                };
-                ExecExam(rq).then(response => {
-                    let AnsweMode = item.AnsweMode;
-                    let name = '';
-                    if (AnsweMode === 20) {
-                        name = 'emstindex';
-                    } else if (AnsweMode === 30) {
-                        name = 'graduallyem';
-                    } else {
-                        this.$Message.warning('练习模式还未开发');
-                    }
-                    let routeData = this.$router.resolve({
-                        name: name, // graduallyem emstindex
-                        query: item,
-                        params: {}
-                    });
-                    window.open(routeData.href, '_blank');
+
+            },
+            // 打开考试信息
+            handleOpenExam () {
+                this.$router.push({
+                    name: 'exam_set'
                 });
+            },
+            // 打开考试信息
+            handleopenscore (item) {
+                this.scoremodal = true;
+                let scoreDataList = [];
+                scoreDataList.push(item);
+                this.scoreData = scoreDataList;
             },
             // 刷新数据
             fetchData () {
                 try {
+                    this.listQuery.type = 'lately';
                     GetHomeExam(this.listQuery).then(response => {
-                        this.examlist = response.data;
+                        this.examlately = response.data;
                     });
                 } catch (error) {
                     console.log(error);

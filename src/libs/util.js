@@ -561,5 +561,20 @@ util.isArrayFn = function (value) {
         return Object.prototype.toString.call(value) === '[object Array]';
     }
 };
+// 获取时间戳
+util.gettimestamp = function (val) {
+    let dt = new Date(val);
+    let times = dt.valueOf() + '';
+    times = times.substring(0, times.length - 3);
+    return times;
+};
+
+// 获取当前时间戳
+util.getnowtimestamp = function () {
+    let dt = new Date();
+    let times = dt.valueOf() + '';
+    times = times.substring(0, times.length - 3);
+    return times;
+};
 
 export default util;

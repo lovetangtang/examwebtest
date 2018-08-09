@@ -115,7 +115,7 @@ export const appRouter = [
         name: 'errorpage',
         component: Main,
         children: [
-            { path: 'index', title: '历史考试', name: 'hisexam', component: () => import('@/views/error-page/error-page.vue') }
+            { path: 'index', title: '历史考试', name: 'hisexam', component: () => import('@/views/home/hisexam.vue') }
         ]
     },
     {

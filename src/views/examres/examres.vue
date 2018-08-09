@@ -36,9 +36,15 @@
             </div> -->
             <div>
                 <Row class="margin-top-70" :gutter="50">
+
                     <Col span="12">
                     <template :style="{display:showstatus.IsShowLook}">
-                        <Button class="maxwidth  btn-light-blue" @click="handlerexamresolve" shape="circle" size="large">查看解析</Button>
+                        <template v-if="showConfig.IsShowAnswer">
+                            <Button class="maxwidth  btn-light-blue" @click="handlerexamresolve" shape="circle" size="large">查看解析</Button>
+                        </template>
+                        <template v-else>
+                            <Button class="maxwidth" @click="goHome" type="primary" shape="circle" size="large">回到首页</Button>
+                        </template>
                     </template>
                     </Col>
                     <Col span="12">
@@ -75,6 +81,7 @@
         },
         mounted () {
             this.init();
+            window.addEventListener('resize', this.fun_null);
             this.$nextTick(() => {
 
             });
@@ -96,6 +103,15 @@
 
                 });
             },
+            fun_null () {
+                console.log(33);
+                return false;
+            },
+            goHome () {
+                this.$router.push({
+                    name: 'home_index'
+                });
+            },
             handlerexamresolve () {
                 this.$router.push({
                     name: 'examresolveindex',
@@ -103,6 +119,10 @@
                 });
             },
             handlerrestexam () {
+                this.$router.push({
+                    name: 'home_index'
+                });
+                return;
                 this.$router.push({
                     name: 'emstindex',
                     query: []
