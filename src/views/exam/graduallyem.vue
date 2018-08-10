@@ -202,6 +202,7 @@
                 Letter: util.Letter,
                 Fullscreen: false,
                 nowSingleData: [],
+                setIntervalsave: null,
                 subjectData: [],
                 answerCardlist: [],
                 hi: 0, // 题库类型索引
@@ -304,6 +305,10 @@
         },
         created () {
             this.fetchData();
+            this.setIntervalsave = setInterval(this.keepSaveData, 20000);
+        },
+        beforeDestroy () {
+            clearInterval(this.setIntervalsave);
         },
         mounted () {
             this.init();
@@ -388,6 +393,35 @@
                         }
                     }
                 }
+            },
+            keepSaveData () {
+                let examanswer = {
+                    ExamID: this.listQuery.KeyID,
+                    action: 'saveanswer',
+                    type: 'edit',
+                    answerlist: []
+                };
+                let sbdata = this.subjectData;
+                for (let i = 0; i < sbdata.length; i++) {
+                    for (let j = 0; j < sbdata[i].subjectlist.length; j++) {
+                        let answer = sbdata[i].subjectlist[j];
+                        let json = {
+                            SubjectID: answer.KeyID,
+                            RightAnswer: answer.RightAnswer,
+                            SubjecSubClass: sbdata[i].SubjecSubClass,
+                            tkanswer: JSON.stringify(answer.tkanswer),
+                            CkClassID: sbdata[i].CkClassID
+                        };
+                        if (sbdata[i].SubjecSubClass === 12) {
+                            json.RightAnswer = json.RightAnswer.join('|');
+                        }
+                        examanswer.answerlist.push(json);
+                    }
+                }
+                examanswer.answerlist = JSON.stringify(examanswer.answerlist);
+                SaveAnswer(examanswer).then(response => {
+    
+                });
             },
             // 检查是否全屏
             checkFull () {

@@ -22,7 +22,7 @@
                     <Col :md="11" :style="{marginBottom: '10px'}">
                     <Card class="bd-left-true box-amt paper-bg">
                         <b class="card-user-infor-name">{{item.ExamName}}</b>
-                        <b style="color:#ff9900">100分</b>
+                        <b style="color:#ff9900">{{item.Score}}分</b>
                          <b class="scoredetail" @click="handleopenscore(item)">成绩详情</b>
                         <div class="divide_line"></div>
                         <div class="pd-home-sj">
@@ -78,7 +78,7 @@
                             <Row>
                                 <Col span="24">
                                 <div>
-                                    提前交卷时间：{{fun_gettimev(item.AdHandoverTime)}}
+                                    提前交卷时间：{{item.AdHandoverTime===-1?'无限制':item.AdHandoverTime}}
                                 </div>
                                 </Col>
                             </Row>
@@ -103,12 +103,22 @@
                     </Card>
                     </Col>
                 </template>
+                 <template v-if="examlately.length===0">
+                    <Col :md="11" :style="{marginBottom: '10px'}">
+                    <Card class="bd-left-true box-amt paper-bg">
+                        <b class="card-user-infor-name"></b>
+                        <div class="pd-home-sj">
+                            暂无考试信息
+                        </div>
+                    </Card>
+                    </Col>
+                </template>
             </Row>
             </Col>
             </Col>
         </Row>
         <!-- 组卷方式窗口 -->
-        <Modal   ok-text="确定" v-model="scoremodal" width="900" >
+        <Modal     title="成绩详情"   ok-text="确定" v-model="scoremodal" width="900" >
           <Table border :columns="columns" :data="scoreData"></Table>
         </Modal>
     </div>
@@ -178,6 +188,29 @@
                     }, {
                         title: '分数',
                         key: 'Score'
+                    }, {
+                        title: '试卷详情',
+                        key: 'action',
+                        width: 90,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.showEdit(params);
+                                        }
+                                    }
+                                }, '查看')
+                            ]);
+                        }
                     }
                 ],
                 examnowlist: [],

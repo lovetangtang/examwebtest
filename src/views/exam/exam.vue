@@ -188,7 +188,7 @@
                                             <p class="margin-top-20 head-bm-line">
                                                 <span>{{at.SbTitleName}}(共{{at.SubtSum}}题，合计{{at.SubScore}}分)</span>
                                             </p>
-                                            <template   v-for="c in at.content">
+                                            <template v-for="c in at.content">
                                                 <label class="margin-top-10">{{c}}题已答</label>&nbsp;&nbsp;
                                             </template>
                                         </div>
@@ -238,6 +238,7 @@
                 subjectData: [],
                 exitScreenTime: 0,
                 isValidScree: true,
+                setIntervalsave: null,
                 answerCardlist: [],
                 listQuery: {
                     action: 'getawexamlist',
@@ -295,6 +296,7 @@
         },
         created () {
             this.fetchData();
+            this.setIntervalsave = setInterval(this.keepSaveData, 20000);
         },
         mounted () {
             this.init();
@@ -305,6 +307,9 @@
             this.$nextTick(() => {
 
             });
+        },
+        beforeDestroy () {
+            clearInterval(this.setIntervalsave);
         },
         destroyed () {
             tinymce.get('tinymceEditer').destroy();
@@ -405,6 +410,35 @@
                     console.log(error);
                 }
             },
+            keepSaveData () {
+                let examanswer = {
+                    ExamID: this.listQuery.KeyID,
+                    action: 'saveanswer',
+                    type: 'edit',
+                    answerlist: []
+                };
+                let sbdata = this.subjectData;
+                for (let i = 0; i < sbdata.length; i++) {
+                    for (let j = 0; j < sbdata[i].subjectlist.length; j++) {
+                        let answer = sbdata[i].subjectlist[j];
+                        let json = {
+                            SubjectID: answer.KeyID,
+                            RightAnswer: answer.RightAnswer,
+                            SubjecSubClass: sbdata[i].SubjecSubClass,
+                            tkanswer: JSON.stringify(answer.tkanswer),
+                            CkClassID: sbdata[i].CkClassID
+                        };
+                        if (sbdata[i].SubjecSubClass === 12) {
+                            json.RightAnswer = json.RightAnswer.join('|');
+                        }
+                        examanswer.answerlist.push(json);
+                    }
+                }
+                examanswer.answerlist = JSON.stringify(examanswer.answerlist);
+                SaveAnswer(examanswer).then(response => {
+    
+                });
+            },
             // 页面切换限制
             handleExitScree (type) {
                 if (this.isValidScree) {
@@ -413,11 +447,10 @@
                         this.$Modal.confirm({
                             title: '题型',
                             'mask-closable': 'false',
-                            content: '<p style="font-size:18px">页面已切换' + this.exitScreenTime + '次,超过一定次数将自动提交试卷</p>',
-                            onOk: () => {
-                            },
-                            onCancel: () => {
-                            }
+                            content: '<p style="font-size:18px">页面已切换' + this.exitScreenTime +
+                                '次,超过一定次数将自动提交试卷</p>',
+                            onOk: () => {},
+                            onCancel: () => {}
                         });
                         // 要执行的动作
                         if (this.Examinfo.SwitchNumLimit > 0) {
@@ -469,7 +502,8 @@
             },
             // 检查是否全屏
             checkFull () {
-                var isFull = document.fullscreenEnabled || window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+                var isFull = document.fullscreenEnabled || window.fullScreen || document.webkitIsFullScreen || document
+                    .msFullscreenEnabled;
 
                 // to fix : false || undefined == undefined
                 if (isFull === undefined) isFull = false;

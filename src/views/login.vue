@@ -30,7 +30,7 @@
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
                     </Form>
-                    <p class="login-tip">输入任意用户名和密码即可</p>
+                    <p class="login-tip">请输入RTX账号登录</p>
                 </div>
             </Card>
         </div>
@@ -45,7 +45,7 @@ export default {
     data () {
         return {
             form: {
-                userName: 'iview_admin',
+                userName: '',
                 password: ''
             },
             rules: {
@@ -62,8 +62,9 @@ export default {
         handleSubmit () {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    Cookies.set('user', this.form.userName);
+                    let _self = this;
                     login(this.form.userName, this.form.password, 'RTX').then(response => {
+                        Cookies.set('user', _self.form.userName);
                         this.$router.push({
                             name: 'home_index'
                         });

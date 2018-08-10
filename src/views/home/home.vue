@@ -46,7 +46,7 @@
                                 </div>
                                 </Col>
                             </Row>
-                             <Row>
+                            <Row>
                                 <Col span="12">
                                 <div>
                                     考试次数限制：{{item.AnsweNumLimit===-1?'无限制':item.AnsweNumLimit}}
@@ -84,7 +84,7 @@
                             <Row>
                                 <Col span="24">
                                 <div>
-                                    提前交卷时间：{{fun_gettimev(item.AdHandoverTime)}}
+                                    提前交卷时间：{{item.AdHandoverTime===-1?'无限制':item.AdHandoverTime}}
                                 </div>
                                 </Col>
                             </Row>
@@ -181,8 +181,7 @@
                 return util.getExamModeName(v);
             },
             // 获取考试次数限制
-            fun_getanswenumlimit (v) {
-            },
+            fun_getanswenumlimit (v) {},
             fun_startexam (item) {
                 let rq = {
                     action: 'execexam',
@@ -192,9 +191,9 @@
                     let AnsweMode = item.AnsweMode;
                     let name = '';
                     if (AnsweMode === 20) {
-                        name = 'emstindex';
-                    } else if (AnsweMode === 30) {
                         name = 'graduallyem';
+                    } else if (AnsweMode === 30) {
+                        name = 'emstindex';
                     } else {
                         this.$Message.warning('练习模式还未开发');
                     }
