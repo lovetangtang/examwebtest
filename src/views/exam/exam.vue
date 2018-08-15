@@ -413,7 +413,7 @@
             keepSaveData () {
                 let examanswer = {
                     ExamID: this.listQuery.KeyID,
-                    action: 'saveanswer',
+                    action: 'SaveAnswer',
                     type: 'edit',
                     answerlist: []
                 };
@@ -528,7 +528,7 @@
 
                 let examanswer = {
                     ExamID: this.listQuery.KeyID,
-                    action: 'saveanswer',
+                    action: 'SaveAnswer',
                     answerlist: []
                 };
                 let sbdata = this.subjectData;
@@ -569,16 +569,13 @@
                 this.$Spin.hide();
             },
             callback (v) {
-                return;
                 this.$Modal.confirm({
                     title: '确认交卷',
                     'mask-closable': 'false',
                     content: '<p style="font-size:18px">答题时间到，系统将在3秒后自动交卷</p>',
                     onOk: () => {
-                        this.$Message.info('Clicked ok');
                     },
                     onCancel: () => {
-                        this.$Message.info('Clicked cancel');
                     }
                 });
                 setTimeout(() => {

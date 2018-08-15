@@ -130,14 +130,14 @@ export const appRouter = [
                 icon: 'compose',
                 name: 'text-editor',
                 title: '知识库',
-                component: () => import('@/views/my-components/text-editor/text-editor.vue')
+                component: () => import('@/views/error-page/404.vue')
             },
             {
                 path: 'md-editor',
                 icon: 'pound',
                 name: 'md-editor',
                 title: '课程',
-                component: () => import('@/views/my-components/markdown-editor/markdown-editor.vue')
+                component: () => import('@/views/error-page/404.vue')
             }
         ]
     }

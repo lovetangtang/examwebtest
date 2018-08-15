@@ -84,6 +84,13 @@
                             <Row>
                                 <Col span="24">
                                 <div>
+                                    答题模式：{{fun_getAnsweMode(item.AnsweMode)}}
+                                </div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="24">
+                                <div>
                                     提前交卷时间：{{item.AdHandoverTime===-1?'无限制':item.AdHandoverTime}}
                                 </div>
                                 </Col>
@@ -180,11 +187,26 @@
             fun_getexammode (v) {
                 return util.getExamModeName(v);
             },
+            fun_getAnsweMode (v) {
+                switch (v) {
+                    case 10:
+                        return '练习模式';
+                        break;
+                    case 20:
+                        return '逐题模式';
+                        break;
+                    case 30:
+                        return '整卷模式';
+                        break;
+                    default:
+                        break;
+                }
+            },
             // 获取考试次数限制
             fun_getanswenumlimit (v) {},
             fun_startexam (item) {
                 let rq = {
-                    action: 'execexam',
+                    action: 'ExecExam',
                     KeyID: item.KeyID
                 };
                 ExecExam(rq).then(response => {

@@ -23,7 +23,7 @@
                     <Card class="bd-left-true box-amt paper-bg">
                         <b class="card-user-infor-name">{{item.ExamName}}</b>
                         <b style="color:#ff9900">{{item.Score}}分</b>
-                         <b class="scoredetail" @click="handleopenscore(item)">成绩详情</b>
+                        <b class="scoredetail" @click="handleopenscore(item)">成绩详情</b>
                         <div class="divide_line"></div>
                         <div class="pd-home-sj">
                             <Row>
@@ -78,6 +78,13 @@
                             <Row>
                                 <Col span="24">
                                 <div>
+                                    答题模式：{{fun_getAnsweMode(item.AnsweMode)}}
+                                </div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="24">
+                                <div>
                                     提前交卷时间：{{item.AdHandoverTime===-1?'无限制':item.AdHandoverTime}}
                                 </div>
                                 </Col>
@@ -103,7 +110,7 @@
                     </Card>
                     </Col>
                 </template>
-                 <template v-if="examlately.length===0">
+                <template v-if="examlately.length===0">
                     <Col :md="11" :style="{marginBottom: '10px'}">
                     <Card class="bd-left-true box-amt paper-bg">
                         <b class="card-user-infor-name"></b>
@@ -118,8 +125,8 @@
             </Col>
         </Row>
         <!-- 组卷方式窗口 -->
-        <Modal     title="成绩详情"   ok-text="确定" v-model="scoremodal" width="900" >
-          <Table border :columns="columns" :data="scoreData"></Table>
+        <Modal title="成绩详情" ok-text="确定" v-model="scoremodal" width="900">
+            <Table border :columns="columns" :data="scoreData"></Table>
         </Modal>
     </div>
 </template>
@@ -143,76 +150,74 @@
                 },
                 scoremodal: false,
                 scoreData: [],
-                columns: [
-                    {
-                        title: '考试状态',
-                        key: 'ExamStatus',
-                        render: (h, params) => {
-                            let sc = params.row.ExamStatus;
-                            let v = this.fun_getExamStatus(sc);
-                            return v;
-                        }
-                    }, {
-                        title: '是否及格',
-                        key: 'IsPass',
-                        render: (h, params) => {
-                            let sc = params.row.IsPass;
-                            let v = this.fun_getispass(sc);
-                            return v;
-                        }
-                    }, {
-                        title: '答题次数',
-                        key: 'ReplyNum'
-                    }, {
-                        title: '交卷时间',
-                        key: 'SubmitTime'
-                    }, {
-                        title: '答卷时间',
-                        key: 'AnswerTime'
-                    }, {
-                        title: '系统判分',
-                        key: 'JudgmentStatus',
-                        render: (h, params) => {
-                            let sc = params.row.JudgmentStatus;
-                            let v = this.fun_getJudgmentStatus(sc);
-                            return v;
-                        }
-                    }, {
-                        title: '人工判分',
-                        key: 'IsJudgment',
-                        render: (h, params) => {
-                            let sc = params.row.IsJudgment;
-                            let v = this.fun_getIsJudgment(sc);
-                            return v;
-                        }
-                    }, {
-                        title: '分数',
-                        key: 'Score'
-                    }, {
-                        title: '试卷详情',
-                        key: 'action',
-                        width: 90,
-                        align: 'center',
-                        render: (h, params) => {
-                            return h('div', [
-                                h('Button', {
-                                    props: {
-                                        type: 'primary',
-                                        size: 'small'
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.showEdit(params);
-                                        }
-                                    }
-                                }, '查看')
-                            ]);
-                        }
+                columns: [{
+                    title: '考试状态',
+                    key: 'ExamStatus',
+                    render: (h, params) => {
+                        let sc = params.row.ExamStatus;
+                        let v = this.fun_getExamStatus(sc);
+                        return v;
                     }
-                ],
+                }, {
+                    title: '是否及格',
+                    key: 'IsPass',
+                    render: (h, params) => {
+                        let sc = params.row.IsPass;
+                        let v = this.fun_getispass(sc);
+                        return v;
+                    }
+                }, {
+                    title: '答题次数',
+                    key: 'ReplyNum'
+                }, {
+                    title: '交卷时间',
+                    key: 'SubmitTime'
+                }, {
+                    title: '答卷时间',
+                    key: 'AnswerTime'
+                }, {
+                    title: '系统判分',
+                    key: 'JudgmentStatus',
+                    render: (h, params) => {
+                        let sc = params.row.JudgmentStatus;
+                        let v = this.fun_getJudgmentStatus(sc);
+                        return v;
+                    }
+                }, {
+                    title: '人工判分',
+                    key: 'IsJudgment',
+                    render: (h, params) => {
+                        let sc = params.row.IsJudgment;
+                        let v = this.fun_getIsJudgment(sc);
+                        return v;
+                    }
+                }, {
+                    title: '分数',
+                    key: 'Score'
+                }, {
+                    title: '试卷详情',
+                    key: 'action',
+                    width: 90,
+                    align: 'center',
+                    render: (h, params) => {
+                        return h('div', [
+                            h('Button', {
+                                props: {
+                                    type: 'primary',
+                                    size: 'small'
+                                },
+                                style: {
+                                    marginRight: '5px'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.showEdit(params);
+                                    }
+                                }
+                            }, '查看')
+                        ]);
+                    }
+                }],
                 examnowlist: [],
                 examlately: []
             };
@@ -247,6 +252,21 @@
             },
             fun_getexammode (v) {
                 return util.getExamModeName(v);
+            },
+            fun_getAnsweMode (v) {
+                switch (v) {
+                    case 10:
+                        return '练习模式';
+                        break;
+                    case 20:
+                        return '逐题模式';
+                        break;
+                    case 30:
+                        return '整卷模式';
+                        break;
+                    default:
+                        break;
+                }
             },
             // 获取答题状态
             fun_getispass (v) {

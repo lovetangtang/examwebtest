@@ -251,11 +251,16 @@
                                     answersum += 1;
                                     aslist['content'].push(j + 1);
                                 }
-                            } else {
+                            } else if (val[i].SubjecSubClass === 20) {
                                 if (val[i].subjectlist[j].RightAnswer !== '') {
                                     answersum += 1;
                                     aslist['content'].push(j + 1);
                                 }
+                            } else if (val[i].SubjecSubClass === 30) {
+                                // if (val[i].subjectlist[i].tkanswer[j].value !== '') {
+                                //     answersum += 1;
+                                //     aslist['content'].push(j + 1);
+                                // }
                             }
                         }
                         answerlist.push(aslist);
@@ -397,7 +402,7 @@
             keepSaveData () {
                 let examanswer = {
                     ExamID: this.listQuery.KeyID,
-                    action: 'saveanswer',
+                    action: 'SaveAnswer',
                     type: 'edit',
                     answerlist: []
                 };
@@ -539,7 +544,7 @@
 
                 let examanswer = {
                     ExamID: this.listQuery.KeyID,
-                    action: 'saveanswer',
+                    action: 'SaveAnswer',
                     answerlist: []
                 };
                 let sbdata = this.subjectData;
@@ -580,17 +585,13 @@
                 this.$Spin.hide();
             },
             callback (v) {
-                console.log('到时间了');
-                return;
                 this.$Modal.confirm({
                     title: '确认交卷',
                     'mask-closable': 'false',
                     content: '<p style="font-size:18px">答题时间到，系统将在3秒后自动交卷</p>',
                     onOk: () => {
-                        this.$Message.info('Clicked ok');
                     },
                     onCancel: () => {
-                        this.$Message.info('Clicked cancel');
                     }
                 });
                 setTimeout(() => {
