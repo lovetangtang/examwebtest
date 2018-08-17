@@ -18,10 +18,24 @@
                             <div class="box-content">
                                 <Row>
                                     <Col span="11" class="bg-white box-border">
-                                    <div class="box-ans-content">
-                                        <p class="ft-nm">
-                                            <span class="fc-blue">{{ci+1}}.</span>{{subjectData[hi].subjectlist[ci].Stem}}({{subjectData[hi].subjectlist[ci].DefaultScore}}分)</p>
-                                    </div>
+                                    <!-- 填空题干 -->
+                                    <template v-if="subjectData[hi].SubjecSubClass===30">
+                                        <div class="box-ans-content">
+                                            <p class="ft-nm">
+                                                <span class="fc-blue">{{ci+1}}.</span>
+                                                <span v-html="fun_cltkstemstyle(subjectData[hi].subjectlist[ci].Stem)"></span>
+                                                <span>({{subjectData[hi].subjectlist[ci].DefaultScore}}分)</span>
+                                            </p>
+                                        </div>
+                                    </template>
+                                    <!-- 其他题干 -->
+                                    <template v-else>
+                                        <div class="box-ans-content">
+                                            <p class="ft-nm">
+                                                <span class="fc-blue">{{ci+1}}.</span>{{subjectData[hi].subjectlist[ci].Stem}}({{subjectData[hi].subjectlist[ci].DefaultScore}}分)</p>
+                                        </div>
+                                    </template>
+
                                     </Col>
                                     <Col span="12" class="bg-white fl-r box-border">
                                     <div class="box-ans-content">
@@ -63,9 +77,9 @@
                                             <Form class="examline-bottom" ref="formInline" :label-width="30">
                                                 <template v-for="(tk,ti) in subjectData[hi].subjectlist[ci].Stem.split('()').length-1">
                                                     <div class="margin-bottom-10 margin-top-10">
-                                                        <Input v-model="subjectData[hi].subjectlist[ci].tkanswer[ti].value">
+                                                        <Input v-on:input ="intputChange" v-model="subjectData[hi].subjectlist[ci].tkanswer[ti].value">
                                                         <span slot="prepend">
-                                                            <span>&nbsp;{{ti+1}}&nbsp;</span>
+                                                            <span>&nbsp;{{fun_tknrfh(ti+1)}}&nbsp;</span>
                                                         </span>
                                                         </Input>
                                                     </div>
@@ -163,7 +177,7 @@
                             <span class="demo-Circle-inner" style="font-size:15px">{{percent}}%</span>
                         </Circle>
                     </div>
-                    <Button type="primary" @click="handlersubmit" style="width:100%">提交</Button>
+                    <Button type="primary" @click="handlersubmit" style="width:100%">交卷</Button>
                 </div>
                 </Col>
             </Row>
@@ -228,46 +242,7 @@
             'subjectData': {
                 // 深度监听，可监听到对象、数组分值，总题数的变化
                 handler (val, oldVal) {
-                    let sbsum = 0;
-                    let answersum = 0;
-                    let answerlist = [];
-                    for (let i = 0; i < val.length; i++) {
-                        let aslist = {
-                            title: i + 1,
-                            SbTitleName: val[i].SbTitleName,
-                            content: [],
-                            SubtSum: val[i].SubtSum,
-                            SubScore: val[i].SubScore
-                        };
-                        for (let j = 0; j < val[i].subjectlist.length; j++) {
-                            sbsum += 1;
-                            if (val[i].SubjecSubClass === 12) {
-                                if (val[i].subjectlist[j].RightAnswer.length > 0) {
-                                    answersum += 1;
-                                    aslist['content'].push(j + 1);
-                                }
-                            } else if (val[i].SubjecSubClass === 11) {
-                                if (val[i].subjectlist[j].RightAnswer !== -1) {
-                                    answersum += 1;
-                                    aslist['content'].push(j + 1);
-                                }
-                            } else if (val[i].SubjecSubClass === 20) {
-                                if (val[i].subjectlist[j].RightAnswer !== '') {
-                                    answersum += 1;
-                                    aslist['content'].push(j + 1);
-                                }
-                            } else if (val[i].SubjecSubClass === 30) {
-                                // if (val[i].subjectlist[i].tkanswer[j].value !== '') {
-                                //     answersum += 1;
-                                //     aslist['content'].push(j + 1);
-                                // }
-                            }
-                        }
-                        answerlist.push(aslist);
-                    }
-                    let percent = Math.ceil((answersum / sbsum) * 100);
-                    this.percent = percent;
-                    this.answerCardlist = answerlist;
+                    this.watchData(val);
                 },
                 deep: true
             },
@@ -363,6 +338,108 @@
                     }
                 });
             },
+            intputChange () {
+                this.watchData(this.subjectData);
+            },
+            watchData (val, oldVal) {
+                let sbsum = 0;
+                let answersum = 0;
+                let answerlist = [];
+                for (let i = 0; i < val.length; i++) {
+                    let aslist = {
+                        title: i + 1,
+                        SbTitleName: val[i].SbTitleName,
+                        content: [],
+                        SubtSum: val[i].SubtSum,
+                        SubScore: val[i].SubScore
+                    };
+                    for (let j = 0; j < val[i].subjectlist.length; j++) {
+                        sbsum += 1;
+                        if (val[i].SubjecSubClass === 12) {
+                            if (val[i].subjectlist[j].RightAnswer.length > 0) {
+                                answersum += 1;
+                                aslist['content'].push(j + 1);
+                            }
+                        } else if (val[i].SubjecSubClass === 11) {
+                            if (val[i].subjectlist[j].RightAnswer !== -1) {
+                                answersum += 1;
+                                aslist['content'].push(j + 1);
+                            }
+                        } else if (val[i].SubjecSubClass === 30) {
+                            let tkanswerArry = val[i].subjectlist[j].tkanswer;
+                            let success = false;
+                            for (let t = 0; t < tkanswerArry.length; t++) {
+                                if (tkanswerArry[t].value !== '') {
+                                    success = true;
+                                };
+                            }
+                            if (success) {
+                                answersum += 1;
+                                aslist['content'].push(j + 1);
+                            }
+                        } else {
+                            if (val[i].subjectlist[j].RightAnswer !== '') {
+                                answersum += 1;
+                                aslist['content'].push(j + 1);
+                            }
+                        }
+                    }
+                    answerlist.push(aslist);
+                }
+                let percent = Math.ceil((answersum / sbsum) * 100);
+                this.percent = percent;
+                this.answerCardlist = answerlist;
+            },
+            // 处理填空题的题干填空显示样式
+            fun_cltkstemstyle (str) {
+                let arrystr = str.split('()');
+                let stem = '';
+                stem = str;
+                for (let i = 0; i < arrystr.length; i++) {
+                    let fh = this.fun_tknrfh(i + 1);
+                    let tkdiv = '<span class="gap">' + fh + '</span>';
+                    stem = stem.replace(/\(\)/, tkdiv);
+                }
+                return stem;
+                console.log(stem);
+            },
+            // 填空符号
+            fun_tknrfh (v) {
+                switch (v) {
+                    case 1:
+                        return '①';
+                        break;
+                    case 2:
+                        return '②';
+                        break;
+                    case 3:
+                        return '③';
+                        break;
+                    case 4:
+                        return '④';
+                        break;
+                    case 5:
+                        return '⑤';
+                        break;
+                    case 6:
+                        return '⑥';
+                        break;
+                    case 7:
+                        return '⑦';
+                        break;
+                    case 8:
+                        return '⑧';
+                        break;
+                    case 9:
+                        return '⑨';
+                        break;
+                    case 10:
+                        return '⑩';
+                        break;
+                    default:
+                        break;
+                }
+            },
             // 页面切换限制
             handleExitScree (type) {
                 if (this.isValidScree) {
@@ -372,7 +449,7 @@
                             title: '题型',
                             'mask-closable': 'false',
                             content: '<p style="font-size:18px">页面已切换' + this.exitScreenTime +
-                            '次,超过一定次数将自动提交试卷</p>',
+                                '次,超过一定次数将自动提交试卷</p>',
                             onOk: () => {},
                             onCancel: () => {}
                         });
@@ -425,7 +502,7 @@
                 }
                 examanswer.answerlist = JSON.stringify(examanswer.answerlist);
                 SaveAnswer(examanswer).then(response => {
-    
+
                 });
             },
             // 检查是否全屏
@@ -589,10 +666,8 @@
                     title: '确认交卷',
                     'mask-closable': 'false',
                     content: '<p style="font-size:18px">答题时间到，系统将在3秒后自动交卷</p>',
-                    onOk: () => {
-                    },
-                    onCancel: () => {
-                    }
+                    onOk: () => {},
+                    onCancel: () => {}
                 });
                 setTimeout(() => {
                     this.$Modal.remove();

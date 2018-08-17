@@ -36,11 +36,10 @@
             </div> -->
             <div>
                 <Row class="margin-top-70" :gutter="50">
-
                     <Col span="12">
                     <template :style="{display:showstatus.IsShowLook}">
                         <template v-if="showConfig.IsShowAnswer">
-                            <Button class="maxwidth  btn-light-blue" @click="handlerexamresolve" shape="circle" size="large">查看解析</Button>
+                            <Button class="maxwidth  btn-light-blue" @click="goHome" shape="circle" size="large">查看解析</Button>
                         </template>
                         <template v-else>
                             <Button class="maxwidth" @click="goHome" type="primary" shape="circle" size="large">回到首页</Button>
