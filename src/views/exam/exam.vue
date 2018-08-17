@@ -399,12 +399,11 @@
                         }
                         this.init();
                     }).catch(ex => {
-                        console.log(ex);
+                        this.isValidScree = false;
                         this.$Spin.hide();
-                        // this.$router.push({
-                        //     name: 'examresindex',
-                        //     query: []
-                        // });
+                        this.$router.push({
+                            name: 'home_index'
+                        });
                     });
                 } catch (error) {
                     console.log(error);

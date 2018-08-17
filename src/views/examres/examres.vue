@@ -81,7 +81,13 @@
         },
         mounted () {
             this.init();
+            let _self = this;
             window.addEventListener('resize', this.fun_null);
+            window.addEventListener('popstate', function (e) {
+                _self.$router.push({
+                    name: 'home_index'
+                });
+            }, false);
             this.$nextTick(() => {
 
             });
@@ -104,7 +110,6 @@
                 });
             },
             fun_null () {
-                console.log(33);
                 return false;
             },
             goHome () {

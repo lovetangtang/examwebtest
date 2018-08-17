@@ -517,10 +517,10 @@
                         this.nowSingleData = this.subjectData[0];
                     }).catch(ex => {
                         this.$Spin.hide();
-                        // this.$router.push({
-                        //     name: 'examresindex',
-                        //     query: []
-                        // });
+                        this.isValidScree = false;
+                        this.$router.push({
+                            name: 'home_index'
+                        });
                     });
                 } catch (error) {
                     console.log(error);

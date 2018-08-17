@@ -135,6 +135,9 @@
     import {
         GetHomeExam
     } from '@/api/home';
+    import {
+        GetAwExamList
+    } from '@/api/exam_mark';
     import util from '@/libs/util';
     export default {
         name: 'home',
@@ -252,6 +255,25 @@
             },
             fun_getexammode (v) {
                 return util.getExamModeName(v);
+            },
+            // 展开编辑窗体
+            showEdit (params) {
+                let rq = {
+                    action: 'getuserpapermark',
+                    ExamID: params.row.KeyID
+                };
+                GetAwExamList(rq).then(response => {
+                    this.$router.push({
+                        name: 'mypaper',
+                        query: {
+                            ExamID: params.row.KeyID,
+                            UserID: params.row.UserID,
+                            UserName: params.row.UserName,
+                            IsPass: params.row.IsPass,
+                            Score: params.row.Score
+                        }
+                    });
+                });
             },
             fun_getAnsweMode (v) {
                 switch (v) {

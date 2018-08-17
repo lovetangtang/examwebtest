@@ -7,19 +7,6 @@
         <Row>
             <Col span="20" class="ft-lg">当前考试</Col>
             <Col span="4" class="ft-cs">
-            <!-- <Dropdown class="fl-right">
-                <a href="javascript:void(0)">
-                    全部考试
-                    <Icon type="arrow-down-b"></Icon>
-                </a>
-                <DropdownMenu slot="list">
-                    <DropdownItem>驴打滚</DropdownItem>
-                    <DropdownItem>炸酱面</DropdownItem>
-                    <DropdownItem disabled>豆汁儿</DropdownItem>
-                    <DropdownItem>冰糖葫芦</DropdownItem>
-                    <DropdownItem divided>北京烤鸭</DropdownItem>
-                </DropdownMenu>
-            </Dropdown> -->
             </Col>
         </Row>
         <div class="divide_line1"></div>
@@ -99,6 +86,13 @@
                                 <Col span="24">
                                 <div>
                                     最晚迟到时间：{{fun_gettimev(item.LateTime)}}
+                                </div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="12">
+                                <div>
+                                    考试说明：{{item.ExamExplain}}
                                 </div>
                                 </Col>
                             </Row>
@@ -224,7 +218,10 @@
                         query: item,
                         params: {}
                     });
-                    window.open(routeData.href, '_blank');
+                    var tempwindow = window.open('_blank');
+                    tempwindow.location = routeData.href;
+                    // window.open();
+                    // window.open(routeData.href, '_blank');
                 });
             },
             // 刷新数据

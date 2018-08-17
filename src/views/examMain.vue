@@ -7,7 +7,8 @@
             <div class="main-header">
                 <div class="navicon-con hd-mglt">
                     <div slot="top" class="logo-conem">
-                        <img v-show="!shrink" src="../images/logo.jpg" key="max-logo" />
+                        <span class="logo-text" style="margin-left: 20px;" v-show="!shrink">云上在线考试</span>
+                        <!-- <img v-show="!shrink" src="../images/logo.jpg" key="max-logo" /> -->
                         <img v-show="shrink" src="../images/logo-exam.png" key="min-logo" />
                     </div>
                 </div>

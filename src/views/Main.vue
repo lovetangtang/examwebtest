@@ -13,7 +13,8 @@
                     :open-names="openedSubmenuArr"
                     :menu-list="menuList">
                     <div slot="top" class="logo-con">
-                        <img v-show="!shrink"  src="../images/logo.jpg" key="max-logo" />
+                        <span class="logo-text" v-show="!shrink">云上在线考试</span>
+                        <!-- <img v-show="!shrink"  src="../images/logo.jpg" key="max-logo" /> -->
                         <img v-show="shrink" src="../images/logo-min.jpg" key="min-logo" />
                     </div>
                 </shrinkable-menu>
