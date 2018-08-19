@@ -44,7 +44,7 @@
                                             <Form :model="formItem" :label-width="80">
                                                 <RadioGroup v-model="subjectData[hi].subjectlist[ci].RightAnswer">
                                                     <template v-for=" (op,oi) in subjectData[hi].subjectlist[ci].SelectionOption.split('|')">
-                                                        <Radio class="ft-nm margin-top-5 exam-answer" :label="oi+1">{{Letter[oi+1]}}. {{op}} </Radio>
+                                                        <Radio class="ft-nm margin-top-5 exam-answer" :label="oi+1+''">{{Letter[oi+1]}}. {{op}} </Radio>
                                                         </br>
                                                     </template>
                                                 </RadioGroup>
@@ -55,7 +55,7 @@
                                             <Form class="examline-bottom" :model="formItem" :label-width="80">
                                                 <CheckboxGroup v-model="subjectData[hi].subjectlist[ci].RightAnswer">
                                                     <template v-for=" (op,oi) in subjectData[hi].subjectlist[ci].SelectionOption.split('|')">
-                                                        <Checkbox class="ft-nm margin-top-5 exam-answer" :label="oi+1">{{Letter[oi+1]}}. {{op}} </Checkbox>
+                                                        <Checkbox class="ft-nm margin-top-5 exam-answer" :label="oi+1+''">{{Letter[oi+1]}}. {{op}} </Checkbox>
                                                         </br>
                                                     </template>
                                                 </CheckboxGroup>
@@ -77,7 +77,7 @@
                                             <Form class="examline-bottom" ref="formInline" :label-width="30">
                                                 <template v-for="(tk,ti) in subjectData[hi].subjectlist[ci].Stem.split('()').length-1">
                                                     <div class="margin-bottom-10 margin-top-10">
-                                                        <Input v-on:input ="intputChange" v-model="subjectData[hi].subjectlist[ci].tkanswer[ti].value">
+                                                        <Input v-on:input="intputChange" v-model="subjectData[hi].subjectlist[ci].tkanswer[ti].value">
                                                         <span slot="prepend">
                                                             <span>&nbsp;{{fun_tknrfh(ti+1)}}&nbsp;</span>
                                                         </span>
@@ -302,7 +302,7 @@
         },
 
         destroyed () {
-            tinymce.get('tinymceEditer').destroy();
+            // tinymce.get('tinymceEditer').destroy();
         },
         computed: {
             avatorPath () {
@@ -553,21 +553,25 @@
                         let addtime = response.data1.AnsweTime * 60;
                         this.Examinfo.ExamEndTime = parseInt(timc) + addtime;
                         this.$refs.countdown.setEndTime(this.Examinfo.ExamEndTime);
-                        // this.subjectData[0].subjectlist[0].answertimelimit = parseInt(timc) + 123;
-                        // this.$refs.countdownsingle.setEndTime(this.subjectData[0].subjectlist[0].answertimelimit);
                         for (let i = 0; i < this.subjectData.length; i++) {
                             let scls = this.subjectData[i].SubjecSubClass;
                             switch (scls) {
                                 case 11:
                                     for (let j = 0; j < this.subjectData[i].subjectlist.length; j++) {
                                         let json = this.subjectData[i].subjectlist[j];
-                                        json.RightAnswer = -1;
+                                        if (json.RightAnswer === '') {
+                                            json.RightAnswer = -1;
+                                        }
                                     }
                                     break;
                                 case 12:
                                     for (let j = 0; j < this.subjectData[i].subjectlist.length; j++) {
                                         let json = this.subjectData[i].subjectlist[j];
-                                        json.RightAnswer = [];
+                                        if (json.RightAnswer === '') {
+                                            json.RightAnswer = [];
+                                        } else {
+                                            json.RightAnswer = json.RightAnswer.split('|');
+                                        }
                                     }
                                     break;
                                 case 20:
@@ -578,10 +582,19 @@
                                         let json = this.subjectData[i].subjectlist[j];
                                         json['tkanswer'] = [];
                                         let len = json.Stem.split('()').length - 1;
-                                        for (let h = 0; h < len; h++) {
-                                            json.tkanswer.push({
-                                                value: ''
-                                            });
+                                        let examtkAnswer = JSON.parse(json.RightAnswer || '[]');
+                                        if (examtkAnswer.length > 0) {
+                                            for (let h = 0; h < len; h++) {
+                                                json.tkanswer.push({
+                                                    value: examtkAnswer[h].value
+                                                });
+                                            }
+                                        } else {
+                                            for (let h = 0; h < len; h++) {
+                                                json.tkanswer.push({
+                                                    value: ''
+                                                });
+                                            }
                                         }
                                         this.subjectData[i].subjectlist[j] = json;
                                     }
@@ -593,11 +606,13 @@
                         this.init();
                         this.nowSingleData = this.subjectData[0];
                     }).catch(ex => {
-                        this.$Spin.hide();
-                        this.isValidScree = false;
-                        this.$router.push({
-                            name: 'home_index'
-                        });
+                        if (ex.success === false) {
+                            this.$Spin.hide();
+                            this.isValidScree = false;
+                            this.$router.push({
+                                name: 'home_index'
+                            });
+                        }
                     });
                 } catch (error) {
                     console.log(error);

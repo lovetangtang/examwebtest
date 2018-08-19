@@ -25,7 +25,7 @@
                                             <Form class="examline-bottom" :model="formItem" :label-width="80">
                                                 <RadioGroup v-model="sb.RightAnswer">
                                                     <template v-for=" (op,oi) in sb.SelectionOption.split('|')">
-                                                        <Radio class="ft-nm margin-top-5 exam-answer" :label="oi+1">{{Letter[oi+1]}}. {{op}} </Radio>
+                                                        <Radio class="ft-nm margin-top-5 exam-answer" :label="oi+1+''">{{Letter[oi+1]}}. {{op}} </Radio>
                                                         </br>
                                                     </template>
                                                 </RadioGroup>
@@ -55,7 +55,7 @@
                                             <Form class="examline-bottom" :model="formItem" :label-width="80">
                                                 <CheckboxGroup v-model="sb.RightAnswer">
                                                     <template v-for="(op,oi) in sb.SelectionOption.split('|')">
-                                                        <Checkbox class="ft-nm margin-top-5 exam-answer" :label="oi+1">{{Letter[oi+1]}}. {{op}}
+                                                        <Checkbox class="ft-nm margin-top-5 exam-answer" :label="oi+1+''">{{Letter[oi+1]}}. {{op}}
                                                         </Checkbox>
                                                         </br>
                                                     </template>
@@ -389,13 +389,19 @@
                                 case 11:
                                     for (let j = 0; j < this.subjectData[i].subjectlist.length; j++) {
                                         let json = this.subjectData[i].subjectlist[j];
-                                        json.RightAnswer = -1;
+                                        if (json.RightAnswer === '') {
+                                            json.RightAnswer = -1;
+                                        }
                                     }
                                     break;
                                 case 12:
                                     for (let j = 0; j < this.subjectData[i].subjectlist.length; j++) {
                                         let json = this.subjectData[i].subjectlist[j];
-                                        json.RightAnswer = [];
+                                        if (json.RightAnswer === '') {
+                                            json.RightAnswer = [];
+                                        } else {
+                                            json.RightAnswer = json.RightAnswer.split('|');
+                                        }
                                     }
                                     break;
                                 case 20:
@@ -406,10 +412,19 @@
                                         let json = this.subjectData[i].subjectlist[j];
                                         json['tkanswer'] = [];
                                         let len = json.Stem.split('()').length - 1;
-                                        for (let h = 0; h < len; h++) {
-                                            json.tkanswer.push({
-                                                value: ''
-                                            });
+                                        let examtkAnswer = JSON.parse(json.RightAnswer || '[]');
+                                        if (examtkAnswer.length > 0) {
+                                            for (let h = 0; h < len; h++) {
+                                                json.tkanswer.push({
+                                                    value: examtkAnswer[h].value
+                                                });
+                                            }
+                                        } else {
+                                            for (let h = 0; h < len; h++) {
+                                                json.tkanswer.push({
+                                                    value: ''
+                                                });
+                                            }
                                         }
                                         this.subjectData[i].subjectlist[j] = json;
                                     }
@@ -420,11 +435,13 @@
                         }
                         this.init();
                     }).catch(ex => {
-                        this.isValidScree = false;
-                        this.$Spin.hide();
-                        this.$router.push({
-                            name: 'home_index'
-                        });
+                        if (ex.success === false) {
+                            this.$Spin.hide();
+                            this.isValidScree = false;
+                            this.$router.push({
+                                name: 'home_index'
+                            });
+                        }
                     });
                 } catch (error) {
                     console.log(error);
@@ -518,30 +535,31 @@
                             title: '题型',
                             'mask-closable': 'false',
                             content: '<p style="font-size:18px">页面已切换' + this.exitScreenTime +
-                                '次,超过一定次数将自动提交试卷</p>',
+                            '次,超过一定次数将自动提交试卷</p>',
                             onOk: () => {},
                             onCancel: () => {}
                         });
-                        // 要执行的动作
-                        if (this.Examinfo.SwitchNumLimit > 0) {
-                            if (this.exitScreenTime > this.Examinfo.SwitchNumLimit) {
-                                this.$Modal.confirm({
-                                    title: '确认交卷',
-                                    'mask-closable': 'false',
-                                    content: '<p style="font-size:18px">页面切换超过限制，系统将在3秒后自动交卷</p>',
-                                    onOk: () => {
-                                        this.$Message.info('Clicked ok');
-                                    },
-                                    onCancel: () => {
-                                        this.$Message.info('Clicked cancel');
-                                    }
-                                });
-                                setTimeout(() => {
-                                    this.$Modal.remove();
-                                    this.fun_submitexam();
-                                }, 3000);
-                            }
-                        }
+    
+                    // 要执行的动作
+                    // if (this.Examinfo.SwitchNumLimit > 0) {
+                    //     if (this.exitScreenTime > this.Examinfo.SwitchNumLimit) {
+                    //         this.$Modal.confirm({
+                    //             title: '确认交卷',
+                    //             'mask-closable': 'false',
+                    //             content: '<p style="font-size:18px">页面切换超过限制，系统将在3秒后自动交卷</p>',
+                    //             onOk: () => {
+                    //                 this.$Message.info('Clicked ok');
+                    //             },
+                    //             onCancel: () => {
+                    //                 this.$Message.info('Clicked cancel');
+                    //             }
+                    //         });
+                    //         setTimeout(() => {
+                    //             this.$Modal.remove();
+                    //             this.fun_submitexam();
+                    //         }, 3000);
+                    //     }
+                    // }
                     }
                 }
             },
@@ -652,10 +670,16 @@
                 }, 2000);
             },
             handlersubmit () {
+                let content = '';
+                if (this.percent !== 100) {
+                    content = '<p style="font-size:18px">当前题目还未答完，是否确认交卷</p>';
+                } else {
+                    content = '<p style="font-size:18px">确认交卷吗</p>';
+                }
                 this.$Modal.confirm({
                     title: '确认交卷',
                     'mask-closable': 'false',
-                    content: '<p style="font-size:18px">当前题目还未答完，是否确认交卷</p>',
+                    content: content,
                     onOk: () => {
                         this.fun_submitexam();
                     },

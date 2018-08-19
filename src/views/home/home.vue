@@ -17,6 +17,10 @@
                     <Col :md="11" :style="{marginBottom: '10px'}">
                     <Card class="bd-left-true box-amt ">
                         <b class="card-user-infor-name">{{item.ExamName}}</b>
+                        <b v-if="item.AnswerStatus===1" style="float:right;color:#ff9900">{{fun_getAnswerStatus(item.AnswerStatus)}}</b>
+                        <b v-else-if="item.AnswerStatus===3" style="float:right;color:#19be6b">{{fun_getAnswerStatus(item.AnswerStatus)}}</b>
+                        <b v-else-if="item.AnswerStatus===0||item.AnswerStatus===null" style="float:right;color:#ed4014">{{fun_getAnswerStatus(item.AnswerStatus)}}</b>
+                        <b v-else style="float:right;color:#5cadff">{{fun_getAnswerStatus(item.AnswerStatus)}}</b>
                         <div class="divide_line"></div>
                         <div class="pd-home-sj">
                             <Row>
@@ -184,6 +188,26 @@
             fun_getexammode (v) {
                 return util.getExamModeName(v);
             },
+            // 答题状态
+            fun_getAnswerStatus (v) {
+                switch (v) {
+                    case 0:
+                        return '未答题';
+                        break;
+                    case 1:
+                        return '答题中';
+                        break;
+                    case 2:
+                        return '待强制交卷';
+                        break;
+                    case 3:
+                        return '答题完成';
+                        break;
+                    default:
+                        return '未答题';
+                        break;
+                }
+            },
             fun_getAnsweMode (v) {
                 switch (v) {
                     case 10:
@@ -221,10 +245,10 @@
                         query: item,
                         params: {}
                     });
-                    var tempwindow = window.open('_blank');
-                    tempwindow.location = routeData.href;
+                    // var tempwindow = window.open('_blank');
+                    // tempwindow.location = routeData.href;
                     // window.open();
-                    // window.open(routeData.href, '_blank');
+                    window.open(routeData.href, '_blank');
                 });
             },
             // 刷新数据
