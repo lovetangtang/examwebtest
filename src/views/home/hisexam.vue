@@ -106,10 +106,7 @@
                             <Row>
                                 <Col span="18">
                                 <div>
-                                    <Row>
-                                        <Col span="5">考试说明：</Col>
-                                        <Col span="19">{{item.ExamExplain}}</Col>
-                                    </Row>
+                                    考试说明：{{item.ExamExplain}}
                                 </div>
                                 </Col>
                                 <Col span="6" class="tx-r">

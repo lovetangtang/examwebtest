@@ -101,16 +101,13 @@
                                 </Col>
                             </Row>
                             <Row>
-                                <Col span="18">
+                                <Col span="17">
                                 <div>
-                                    <Row>
-                                        <Col span="5">考试说明：</Col>
-                                        <Col span="19">{{item.ExamExplain}}</Col>
-                                    </Row>
+                                    考试说明：{{item.ExamExplain}}
                                 </div>
                                 </Col>
-                                <Col span="6" class="tx-r">
-                                <Button type="primary" class="mg-btm" @click="fun_startexam(item)">开始</Button>
+                                <Col span="7" class="tx-r">
+                                <Button type="primary" class="mg-btm" :disabled="item.ExamTimeStatus" @click="fun_startexam(item)">{{item.ExamTimeStatusContent}}</Button>
                                 </Col>
                             </Row>
                         </div>
@@ -256,6 +253,24 @@
                 try {
                     GetHomeExam(this.listQuery).then(response => {
                         this.examlist = response.data;
+                        for (let i = 0; i < this.examlist.length; i++) {
+                            if (this.examlist[i].ExamTimeStatus) {
+                                var d1 = new Date(this.examlist[i].ExamBeginTime);
+                                var d2 = new Date();
+                                let timeLast = parseInt(d1 - d2) / 1000;
+                                let timer = setInterval(() => {
+                                    if (timeLast >= 0) {
+                                        this.examlist[i].ExamTimeStatusContent = util.formatSeconds(
+                                            timeLast) + '后开始考试';
+                                        timeLast -= 1;
+                                    } else {
+                                        clearInterval(timer);
+                                        this.examlist[i].ExamTimeStatusContent = '开始';
+                                        this.examlist[i].ExamTimeStatus = false;
+                                    }
+                                }, 1000);
+                            }
+                        }
                     });
                 } catch (error) {
                     console.log(error);
