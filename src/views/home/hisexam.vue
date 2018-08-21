@@ -17,117 +17,111 @@
         <div class="divide_line1"></div>
         <Row :gutter="12">
             <Col :xs="24">
-            <Row class-name="home-page-row1" :gutter="10">
-                <template v-for="item in examlately">
-                    <Col :md="11" :style="{marginBottom: '10px'}">
-                    <Card class="bd-left-true box-amt paper-bg">
-                        <b class="card-user-infor-name">{{item.ExamName}}</b>
-                        <b style="color:#ff9900">{{item.Score}}分</b>
-                        <b class="scoredetail" @click="handleopenscore(item)">成绩详情</b>
-                        <div class="divide_line"></div>
-                        <div class="pd-home-sj">
-                            <Row>
-                                <Col span="24">
-                                <div>
-                                    考试时间：{{fun_gettimev(item.ExamBeginTime)}}到{{fun_gettimev(item.ExamEndTime)}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="12">
-                                <div>
-                                    总分：{{item.TotalScore}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="12">
-                                <div>
-                                    考试次数限制：{{item.AnsweNumLimit===-1?'无限制':item.AnsweNumLimit}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="12">
-                                <div>
-                                    及格分数：{{item.PassScore}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="12">
-                                <div>
-                                    组卷方式：{{fun_getassemblytype(item.AssemblyType)}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="24">
-                                <div>
-                                    考试分类：{{fun_getexamtype(item.ExamType)}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="24">
-                                <div>
-                                    考试模式：{{fun_getexammode(item.ExamMode)}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="24">
-                                <div>
-                                    答题模式：{{fun_getAnsweMode(item.AnsweMode)}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="24">
-                                <div>
-                                    提前交卷时间：{{item.AdHandoverTime===-1?'无限制':item.AdHandoverTime}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="24">
-                                <div>
-                                    最晚迟到时间：{{fun_gettimev(item.LateTime)}}
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="24">
-                                <div>
-                                    考试时长：{{item.AnsweTime}}分钟
-                                </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span="18">
-                                <div>
-                                    考试说明：{{item.ExamExplain}}
-                                </div>
-                                </Col>
-                                <Col span="6" class="tx-r">
-                                <span>{{fun_getExamStatus(item.ExamStatus)}}</span>
-                                </Col>
-                            </Row>
-                        </div>
-                    </Card>
-                    </Col>
-                </template>
-                <template v-if="examlately.length===0">
-                    <Col :md="11" :style="{marginBottom: '10px'}">
-                    <Card class="bd-left-true box-amt paper-bg">
-                        <b class="card-user-infor-name"></b>
-                        <div class="pd-home-sj">
-                            暂无考试信息
-                        </div>
-                    </Card>
-                    </Col>
-                </template>
-            </Row>
+            <template v-for="item in examlately">
+                <Card class="bd-left-true box-amt paper-bg inline-div home-card">
+                    <b class="card-user-infor-name">{{item.ExamName}}</b>
+                    <b style="color:#ff9900">{{item.Score}}分</b>
+                    <b class="scoredetail" @click="handleopenscore(item)">成绩详情</b>
+                    <div class="divide_line"></div>
+                    <div class="pd-home-sj">
+                        <Row>
+                            <Col span="24">
+                            <div>
+                                考试时间：{{fun_gettimev(item.ExamBeginTime)}}到{{fun_gettimev(item.ExamEndTime)}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="12">
+                            <div>
+                                总分：{{item.TotalScore}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="12">
+                            <div>
+                                考试次数限制：{{item.AnsweNumLimit===-1?'无限制':item.AnsweNumLimit}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="12">
+                            <div>
+                                及格分数：{{item.PassScore}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="12">
+                            <div>
+                                组卷方式：{{fun_getassemblytype(item.AssemblyType)}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="24">
+                            <div>
+                                考试分类：{{fun_getexamtype(item.ExamType)}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="24">
+                            <div>
+                                考试模式：{{fun_getexammode(item.ExamMode)}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="24">
+                            <div>
+                                答题模式：{{fun_getAnsweMode(item.AnsweMode)}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="24">
+                            <div>
+                                提前交卷时间：{{item.AdHandoverTime===-1?'无限制':item.AdHandoverTime}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="24">
+                            <div>
+                                最晚迟到时间：{{fun_gettimev(item.LateTime)}}
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="24">
+                            <div>
+                                考试时长：{{item.AnsweTime}}分钟
+                            </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="18">
+                            <div>
+                                考试说明：{{item.ExamExplain}}
+                            </div>
+                            </Col>
+                            <Col span="6" class="tx-r">
+                            <span>人工{{fun_getExamStatus(item.ExamStatus)}}</span>
+                            </Col>
+                        </Row>
+                    </div>
+                </Card>
+            </template>
+            <template v-if="examlately.length===0">
+                <Card class="bd-left-true box-amt paper-bg">
+                    <b class="card-user-infor-name"></b>
+                    <div class="pd-home-sj">
+                        暂无考试信息
+                    </div>
+                </Card>
+            </template>
             </Col>
             </Col>
         </Row>

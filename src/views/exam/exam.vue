@@ -434,6 +434,10 @@
                             }
                         }
                         this.init();
+                        // 是否开启全屏切换限制
+                        if (this.Examinfo.SwitchNumLimit === -1) {
+                            this.isValidScree = false;
+                        }
                     }).catch(ex => {
                         if (ex.success === false) {
                             this.$Spin.hide();
