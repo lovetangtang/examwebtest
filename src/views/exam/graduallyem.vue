@@ -44,7 +44,7 @@
                                             <Form :model="formItem" :label-width="80">
                                                 <RadioGroup v-model="subjectData[hi].subjectlist[ci].RightAnswer">
                                                     <template v-for=" (op,oi) in subjectData[hi].subjectlist[ci].SelectionOption.split('|')">
-                                                        <Radio class="ft-nm margin-top-5 exam-answer" :label="oi+1+''">{{Letter[oi+1]}}. {{op}} </Radio>
+                                                        <Radio :disabled="subjectData[hi].subjectlist[ci].AnswerTimeStatus" class="ft-nm margin-top-5 exam-answer" :label="oi+1+''">{{Letter[oi+1]}}. {{op}} </Radio>
                                                         </br>
                                                     </template>
                                                 </RadioGroup>
@@ -55,7 +55,7 @@
                                             <Form class="examline-bottom" :model="formItem" :label-width="80">
                                                 <CheckboxGroup v-model="subjectData[hi].subjectlist[ci].RightAnswer">
                                                     <template v-for=" (op,oi) in subjectData[hi].subjectlist[ci].SelectionOption.split('|')">
-                                                        <Checkbox class="ft-nm margin-top-5 exam-answer" :label="oi+1+''">{{Letter[oi+1]}}. {{op}} </Checkbox>
+                                                        <Checkbox :disabled="subjectData[hi].subjectlist[ci].AnswerTimeStatus" class="ft-nm margin-top-5 exam-answer" :label="oi+1+''">{{Letter[oi+1]}}. {{op}} </Checkbox>
                                                         </br>
                                                     </template>
                                                 </CheckboxGroup>
@@ -65,9 +65,9 @@
                                         <template v-else-if="subjectData[hi].SubjecSubClass===20">
                                             <Form class="examline-bottom" :model="formItem" :label-width="80">
                                                 <RadioGroup v-model="subjectData[hi].subjectlist[ci].RightAnswer">
-                                                    <Radio class="ft-nm margin-top-5 exam-answer" label="true">正确 </Radio>
+                                                    <Radio :disabled="subjectData[hi].subjectlist[ci].AnswerTimeStatus" class="ft-nm margin-top-5 exam-answer" label="true">正确 </Radio>
                                                     </br>
-                                                    <Radio class="ft-nm margin-top-5 exam-answer" label="false">错误</Radio>
+                                                    <Radio :disabled="subjectData[hi].subjectlist[ci].AnswerTimeStatus" class="ft-nm margin-top-5 exam-answer" label="false">错误</Radio>
                                                     </br>
                                                 </RadioGroup>
                                             </Form>
@@ -77,7 +77,7 @@
                                             <Form class="examline-bottom" ref="formInline" :label-width="30">
                                                 <template v-for="(tk,ti) in subjectData[hi].subjectlist[ci].Stem.split('()').length-1">
                                                     <div class="margin-bottom-10 margin-top-10">
-                                                        <Input v-on:input="intputChange" v-model="subjectData[hi].subjectlist[ci].tkanswer[ti].value">
+                                                        <Input :disabled="subjectData[hi].subjectlist[ci].AnswerTimeStatus" v-on:input="intputChange" v-model="subjectData[hi].subjectlist[ci].tkanswer[ti].value">
                                                         <span slot="prepend">
                                                             <span>&nbsp;{{fun_tknrfh(ti+1)}}&nbsp;</span>
                                                         </span>
@@ -94,8 +94,8 @@
                                                 </Col>
                                             </Row>
                                         </template>
-                                        <!-- <div class="analysis">
-                                            <div class="analysis-row">
+                                        <div class="analysis" v-show="subjectData[hi].OneAnsweSecond !== -1">
+                                            <!-- <div class="analysis-row">
                                                 <Row>
                                                     <Col span="6" class="ans-pd-left">正确答案</Col>
                                                     <Col span="18" class="word-wrap ans-pd-left">Blsjdflkjlkdjfljslfjdsflsjdfjsflsjjsdfosdfsdjfjsdlfjksjfklljklsjdfjkl</Col>
@@ -104,13 +104,14 @@
                                             <div class="analysis-row margin-top-8">
                                                 <Col span="6" class="ans-pd-left">解释说明</Col>
                                                 <Col span="18" class="word-wrap ans-pd-left">无</Col>
-                                            </div>
+                                            </div> -->
                                             <p class="emrate-tmv">
                                                 <span>本题答题剩余时间：</span>
-                                                <countdownsingle ref="countdownsingle" :endTime="subjectData[hi].subjectlist[ci].answertimelimit"
-                                                    :callback="callback" endText="已结束"></countdownsingle>
+                                                <span v-show="!subjectData[hi].subjectlist[ci].AnswerTimeStatus">{{subjectData[hi].subjectlist[ci].AnswerTimeStatusContent}}</span>
+                                                <span v-show="subjectData[hi].subjectlist[ci].AnswerTimeStatus">本题答题时间结束</span>
                                             </p>
-                                        </div> -->
+                                        </div>
+
                                     </div>
                                     </Col>
                                 </Row>
@@ -144,7 +145,9 @@
                                                 <span>{{at.SbTitleName}}(共{{at.SubtSum}}题，合计{{at.SubScore}}分)</span>
                                             </p>
                                             <template class="margin-top-10" v-for="c in at.content">
-                                                <label>{{c}}题已答</label>&nbsp;&nbsp;
+                                                <label style="color:red" v-if="c.indexOf('未答')>-1">{{c}}</label>
+                                                <label v-else>{{c}}</label>
+                                                &nbsp;&nbsp;
                                             </template>
                                         </div>
                                     </template>
@@ -358,12 +361,16 @@
                         if (val[i].SubjecSubClass === 12) {
                             if (val[i].subjectlist[j].RightAnswer.length > 0) {
                                 answersum += 1;
-                                aslist['content'].push(j + 1);
+                                aslist['content'].push((j + 1) + '题已答');
+                            } else {
+                                aslist['content'].push((j + 1) + '题未答');
                             }
                         } else if (val[i].SubjecSubClass === 11) {
                             if (val[i].subjectlist[j].RightAnswer !== -1) {
                                 answersum += 1;
-                                aslist['content'].push(j + 1);
+                                aslist['content'].push((j + 1) + '题已答');
+                            } else {
+                                aslist['content'].push((j + 1) + '题未答');
                             }
                         } else if (val[i].SubjecSubClass === 30) {
                             let tkanswerArry = val[i].subjectlist[j].tkanswer;
@@ -375,12 +382,16 @@
                             }
                             if (success) {
                                 answersum += 1;
-                                aslist['content'].push(j + 1);
+                                aslist['content'].push((j + 1) + '题已答');
+                            } else {
+                                aslist['content'].push((j + 1) + '题未答');
                             }
                         } else {
                             if (val[i].subjectlist[j].RightAnswer !== '') {
                                 answersum += 1;
-                                aslist['content'].push(j + 1);
+                                aslist['content'].push((j + 1) + '题已答');
+                            } else {
+                                aslist['content'].push((j + 1) + '题未答');
                             }
                         }
                     }
@@ -389,6 +400,7 @@
                 let percent = Math.ceil((answersum / sbsum) * 100);
                 this.percent = percent;
                 this.answerCardlist = answerlist;
+                console.log(this.answerCardlist);
             },
             // 处理填空题的题干填空显示样式
             fun_cltkstemstyle (str) {
@@ -490,6 +502,7 @@
                         let json = {
                             SubjectID: answer.KeyID,
                             RightAnswer: answer.RightAnswer,
+                            AnswerTimeStatus: answer.AnswerTimeStatus,
                             SubjecSubClass: sbdata[i].SubjecSubClass,
                             tkanswer: JSON.stringify(answer.tkanswer),
                             CkClassID: sbdata[i].CkClassID
@@ -547,12 +560,50 @@
                     GetAwExamList(this.listQuery).then(response => {
                         this.subjectData = response.data;
                         this.Examinfo = response.data1;
+                        let endtime = new Date(this.Examinfo.ExamEndTime);
+                        let endtimestr = endtime.valueOf() + ''; // 结束时间戳
+                        endtimestr = endtimestr.substring(0, endtimestr.length - 3);
+
                         let dt = new Date(response.value);
                         let timc = dt.valueOf() + ''; // .substring(0, dt.valueOf().length - 3);
                         timc = timc.substring(0, timc.length - 3);
                         let addtime = response.data1.AnsweTime * 60;
-                        this.Examinfo.ExamEndTime = parseInt(timc) + addtime;
-                        this.$refs.countdown.setEndTime(this.Examinfo.ExamEndTime);
+                        let limittime = parseInt(timc) + addtime; // 限制时间戳
+
+                        // 判断限制时间错是否大于结束时间戳
+                        if (limittime > endtimestr) {
+                            limittime = endtimestr;
+                        }
+
+                        this.Examinfo.ExamEndTime = limittime;
+
+                        this.$refs.countdown.setEndTime(this.Examinfo.ExamEndTime); // 设置倒计时
+                        if (this.subjectData[this.hi].OneAnsweSecond !== -1) {
+                            // 开启单题时间限制
+                            if (!this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatus) {
+                                let timeLast = this.subjectData[this.hi].OneAnsweSecond;
+                                let timer = setInterval(() => {
+                                    if (timeLast >= 0) {
+                                        this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatusContent =
+                                            util.formatSeconds(
+                                                timeLast);
+                                        timeLast -= 1;
+                                    } else {
+                                        clearInterval(timer);
+                                        this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatusContent =
+                                            '本题答题结束';
+                                        this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatus =
+                                            true;
+                                        this.keepSaveData();
+                                    }
+                                    this.subjectData[this.hi].subjectlist[this.ci].timer = timer;
+                                    this.subjectData[this.hi].subjectlist[this.ci].timeLast = timeLast;
+                                }, 1000);
+                            } else {
+                                this.subjectData[0].subjectlist[0].AnswerTimeStatusContent = '本题答题结束';
+                                this.subjectData[0].subjectlist[0].AnswerTimeStatus = true;
+                            }
+                        }
                         for (let i = 0; i < this.subjectData.length; i++) {
                             let scls = this.subjectData[i].SubjecSubClass;
                             switch (scls) {
@@ -651,6 +702,7 @@
                             SubjectID: answer.KeyID,
                             RightAnswer: answer.RightAnswer,
                             SubjecSubClass: sbdata[i].SubjecSubClass,
+                            AnswerTimeStatus: answer.AnswerTimeStatus,
                             tkanswer: JSON.stringify(answer.tkanswer),
                             CkClassID: sbdata[i].CkClassID
                         };
@@ -714,6 +766,13 @@
 
             },
             handleup () {
+                let _self = this;
+                if (this.subjectData[this.hi].OneAnsweSecond !== -1) {
+                    if (!_self.subjectData[_self.hi].subjectlist[_self.ci].AnswerTimeStatus) {
+                        this.$Message.error('本题答题时间到了才能查看上一题');
+                        return;
+                    }
+                }
                 if (this.hi > 0 && this.ci === 0) {
                     this.hi = this.hi - 1;
                     if (this.ci > 0) {
@@ -726,23 +785,151 @@
                         this.ci = this.ci - 1;
                     }
                 }
-                // let times = this.subjectData[this.hi].subjectlist[this.ci].answertimelimit;
-                // this.$refs.countdownsingle.setEndTime(times);
+                if (this.subjectData[this.hi].OneAnsweSecond !== -1) {
+                    return;
+                    _self.disposeUpTimer().then(status => {
+
+                    }).catch(ex => {
+                        console.log(ex);
+                    });
+                }
             },
             handledown () {
                 if (this.hi === this.subjectData.length - 1 && this.subjectData[this.hi].subjectlist.length - 1 ===
                     this.ci) {
                     return;
                 }
-                if (this.ci === this.subjectData[this.hi].subjectlist.length - 1) {
-                    this.hi = this.hi + 1;
-                    this.ci = 0;
+                let _self = this;
+                if (this.subjectData[this.hi].OneAnsweSecond !== -1 && !this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatus) {
+                    this.$Modal.confirm({
+                        title: '提示',
+                        'mask-closable': 'false',
+                        content: '跳转下一题后本题将不能作答，确定要跳转吗',
+                        onOk: () => {
+                            this.disposeTimer().then(status => {
+                                if (_self.ci === _self.subjectData[_self.hi].subjectlist.length - 1) {
+                                    _self.hi = _self.hi + 1;
+                                    _self.ci = 0;
+                                } else {
+                                    _self.ci = _self.ci + 1;
+                                }
+                                this.starTimer();
+                            });
+                        },
+                        onCancel: () => {}
+                    });
                 } else {
-                    this.ci = this.ci + 1;
+                    // if (this.subjectData[this.hi].OneAnsweSecond !== -1) {
+                    let _self = this;
+                    this.disposeTimer().then(status => {
+                        if (_self.ci === _self.subjectData[_self.hi].subjectlist.length - 1) {
+                            _self.hi = _self.hi + 1;
+                            _self.ci = 0;
+                        } else {
+                            _self.ci = _self.ci + 1;
+                        }
+                        this.starTimer();
+                    });
                 }
+                // } else {
+                //     if (this.ci === this.subjectData[this.hi].subjectlist.length - 1) {
+                //         this.hi = this.hi + 1;
+                //         this.ci = 0;
+                //     } else {
+                //         this.ci = this.ci + 1;
+                //     }
+                // }
+
                 // let tms = util.getnowtimestamp();
                 // this.subjectData[this.hi].subjectlist[this.ci].answertimelimit = parseInt(tms) + 123;
                 // this.$refs.countdownsingle.setEndTime(parseInt(tms) + 123);
+            },
+            // 释放上一步时间
+            disposeUpTimer () {
+                return;
+                let _self = this;
+                return new Promise(function (resolve, reject) {
+                    try {
+                        clearInterval(_self.subjectData[_self.hi].subjectlist[_self.ci].timer);
+                        _self.subjectData[_self.hi].subjectlist[_self.ci].AnswerTimeStatusContent = '本题答题结束';
+                        // alert('行' + _self.hi + '列' + _self.ci);
+                        _self.subjectData[_self.hi].subjectlist[_self.ci].AnswerTimeStatus = true;
+                        _self.keepSaveData();
+                        resolve(true);
+                    } catch (error) {
+                        reject(reject.msg);
+                    }
+                });
+            },
+            // 释放时间
+            disposeTimer () {
+                let _self = this;
+                return new Promise(function (resolve, reject) {
+                    if (_self.subjectData[_self.hi].OneAnsweSecond !== -1) {
+                        // 如果已经超时就不清空
+                        if (!_self.subjectData[_self.hi].subjectlist[_self.ci].AnswerTimeStatus) {
+                            clearInterval(_self.subjectData[_self.hi].subjectlist[_self.ci].timer);
+                            _self.subjectData[_self.hi].subjectlist[_self.ci].AnswerTimeStatusContent =
+                                '本题答题结束';
+                            _self.subjectData[_self.hi].subjectlist[_self.ci].AnswerTimeStatus = true;
+                            _self.subjectData[_self.hi].subjectlist[_self.ci].timeLast = 0;
+                            _self.keepSaveData();
+                        }
+                    } else {
+                        _self.subjectData[_self.hi].subjectlist[_self.ci].AnswerTimeStatus = false;
+                    }
+                    resolve(true);
+                });
+            },
+            // 开启答题时间限制
+            starTimer () {
+                if (this.subjectData[this.hi].OneAnsweSecond !== -1) {
+                    // 开启单题时间限制
+                    if (!this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatus) {
+                        // alert('行' + this.hi + '列' + this.ci);
+                        if (this.subjectData[this.hi].subjectlist[this.ci].timer === null ||
+                            this.subjectData[this.hi].subjectlist[this.ci].timer === undefined) {
+                            let timeLast = this.subjectData[this.hi].OneAnsweSecond;
+                            let timer = setInterval(() => {
+                                if (timeLast >= 0) {
+                                    this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatusContent =
+                                        util.formatSeconds(
+                                            timeLast);
+                                    timeLast -= 1;
+                                } else {
+                                    clearInterval(timer);
+                                    this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatusContent =
+                                        '本题答题结束';
+                                    this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatus = true;
+                                    this.keepSaveData();
+                                }
+                                this.subjectData[this.hi].subjectlist[this.ci].timer = timer;
+                                this.subjectData[this.hi].subjectlist[this.ci].timeLast = timeLast;
+                            }, 1000);
+                        } else {
+                            // if (this.subjectData[this.hi].subjectlist[this.ci].timer!=null&&) {
+                            //     return;
+                            // }
+                            // let timeLast = this.subjectData[this.hi].subjectlist[this.ci].timeLast;
+                            // let timer = setInterval(() => {
+                            //     if (timeLast >= 0) {
+                            //         this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatusContent =
+                            //             util.formatSeconds(
+                            //                 timeLast);
+                            //         timeLast -= 1;
+                            //     } else {
+                            //         clearInterval(timer);
+                            //         this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatusContent =
+                            //             '本题答题结束';
+                            //         this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatus = true;
+                            //         this.keepSaveData();
+                            //     }
+                            //     this.subjectData[this.hi].subjectlist[this.ci].timer = timer;
+                            //     this.subjectData[this.hi].subjectlist[this.ci].timeLast = timeLast;
+                            // }, 1000);
+                        }
+                    }
+                }
             }
         }
     };

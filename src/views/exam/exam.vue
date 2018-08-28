@@ -192,7 +192,8 @@
                                                 <span>{{at.SbTitleName}}(共{{at.SubtSum}}题，合计{{at.SubScore}}分)</span>
                                             </p>
                                             <template v-for="c in at.content">
-                                                <label class="margin-top-10">{{c}}题已答</label>&nbsp;&nbsp;
+                                                <label style="color:red" v-if="c.indexOf('未答')>-1">{{c}}</label>
+                                                <label v-else>{{c}}</label>
                                             </template>
                                         </div>
                                     </template>
@@ -337,12 +338,16 @@
                         if (val[i].SubjecSubClass === 12) {
                             if (val[i].subjectlist[j].RightAnswer.length > 0) {
                                 answersum += 1;
-                                aslist['content'].push(j + 1);
+                                aslist['content'].push((j + 1) + '题已答');
+                            } else {
+                                aslist['content'].push((j + 1) + '题未答');
                             }
                         } else if (val[i].SubjecSubClass === 11) {
                             if (val[i].subjectlist[j].RightAnswer !== -1) {
                                 answersum += 1;
-                                aslist['content'].push(j + 1);
+                                aslist['content'].push((j + 1) + '题已答');
+                            } else {
+                                aslist['content'].push((j + 1) + '题未答');
                             }
                         } else if (val[i].SubjecSubClass === 30) {
                             let tkanswerArry = val[i].subjectlist[j].tkanswer;
@@ -354,12 +359,16 @@
                             }
                             if (success) {
                                 answersum += 1;
-                                aslist['content'].push(j + 1);
+                                aslist['content'].push((j + 1) + '题已答');
+                            } else {
+                                aslist['content'].push((j + 1) + '题未答');
                             }
                         } else {
                             if (val[i].subjectlist[j].RightAnswer !== '') {
                                 answersum += 1;
-                                aslist['content'].push(j + 1);
+                                aslist['content'].push((j + 1) + '题已答');
+                            } else {
+                                aslist['content'].push((j + 1) + '题未答');
                             }
                         }
                     }
@@ -377,11 +386,23 @@
                     GetAwExamList(this.listQuery).then(response => {
                         this.subjectData = response.data;
                         this.Examinfo = response.data1;
+                        let endtime = new Date(this.Examinfo.ExamEndTime);
+                        let endtimestr = endtime.valueOf() + '';// 结束时间戳
+                        endtimestr = endtimestr.substring(0, endtimestr.length - 3);
+
                         let dt = new Date(response.value);
                         let timc = dt.valueOf() + ''; // .substring(0, dt.valueOf().length - 3);
                         timc = timc.substring(0, timc.length - 3);
                         let addtime = response.data1.AnsweTime * 60;
-                        this.Examinfo.ExamEndTime = parseInt(timc) + addtime;
+                        let limittime = parseInt(timc) + addtime;// 限制时间戳
+    
+                        // 判断限制时间错是否大于结束时间戳
+                        if (limittime > endtimestr) {
+                            limittime = endtimestr;
+                        }
+
+                        this.Examinfo.ExamEndTime = limittime;
+
                         this.$refs.countdown.setEndTime(this.Examinfo.ExamEndTime);
                         for (let i = 0; i < this.subjectData.length; i++) {
                             let scls = this.subjectData[i].SubjecSubClass;
