@@ -767,12 +767,12 @@
             },
             handleup () {
                 let _self = this;
-                if (this.subjectData[this.hi].OneAnsweSecond !== -1) {
-                    if (!_self.subjectData[_self.hi].subjectlist[_self.ci].AnswerTimeStatus) {
-                        this.$Message.error('本题答题时间到了才能查看上一题');
-                        return;
-                    }
-                }
+                // if (this.subjectData[this.hi].OneAnsweSecond !== -1) {
+                //     if (!_self.subjectData[_self.hi].subjectlist[_self.ci].AnswerTimeStatus) {
+                //         this.$Message.error('本题答题时间到了才能查看上一题');
+                //         return;
+                //     }
+                // }
                 if (this.hi > 0 && this.ci === 0) {
                     this.hi = this.hi - 1;
                     if (this.ci > 0) {
@@ -890,21 +890,23 @@
                         if (this.subjectData[this.hi].subjectlist[this.ci].timer === null ||
                             this.subjectData[this.hi].subjectlist[this.ci].timer === undefined) {
                             let timeLast = this.subjectData[this.hi].OneAnsweSecond;
+                            let hi = this.hi;
+                            let ci = this.ci;
                             let timer = setInterval(() => {
                                 if (timeLast >= 0) {
-                                    this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatusContent =
+                                    this.subjectData[hi].subjectlist[ci].AnswerTimeStatusContent =
                                         util.formatSeconds(
                                             timeLast);
                                     timeLast -= 1;
                                 } else {
                                     clearInterval(timer);
-                                    this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatusContent =
+                                    this.subjectData[hi].subjectlist[ci].AnswerTimeStatusContent =
                                         '本题答题结束';
-                                    this.subjectData[this.hi].subjectlist[this.ci].AnswerTimeStatus = true;
+                                    this.subjectData[hi].subjectlist[ci].AnswerTimeStatus = true;
                                     this.keepSaveData();
                                 }
-                                this.subjectData[this.hi].subjectlist[this.ci].timer = timer;
-                                this.subjectData[this.hi].subjectlist[this.ci].timeLast = timeLast;
+                                this.subjectData[hi].subjectlist[ci].timer = timer;
+                                this.subjectData[hi].subjectlist[ci].timeLast = timeLast;
                             }, 1000);
                         } else {
                             // if (this.subjectData[this.hi].subjectlist[this.ci].timer!=null&&) {
